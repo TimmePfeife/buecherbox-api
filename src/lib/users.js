@@ -29,13 +29,27 @@ async function authenticateUser(username, password) {
   };
 }
 
+async function createUser(user, credentials) {
+  const sql = `INSERT INTO Users (username, email, password)
+               VALUES ($1, $2, crypt($3, gen_salt('bf'))) RETURNING *`;
+
+  const binds = [
+    credentials[0],
+    user.email,
+    credentials[1]
+  ];
+
+  await Db.query(sql, binds);
+}
+
 function getCredentials(auth) {
   const token = auth.split(" ")[1];
-  return  Buffer.from(token, 'base64').toString('ascii').split(':');
+  return Buffer.from(token, 'base64').toString('ascii').split(':');
 }
 
 module.exports = {
   authenticateJwt,
   authenticateUser,
+  createUser,
   getCredentials
 };
