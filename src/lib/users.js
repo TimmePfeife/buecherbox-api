@@ -3,6 +3,7 @@ const Jwt = require('jsonwebtoken');
 const Secret = require('../config/secret');
 
 function authenticateJwt(jwt) {
+  if (!jwt) return null;
   const token = jwt.split(" ")[1];
   return Jwt.verify(token, Secret.secret);
 }
@@ -22,9 +23,11 @@ async function authenticateUser(username, password) {
 
   if (!result.rows.length) return null;
 
-  const token = Jwt.sign({}, Secret.secret, {expiresIn: 24 * 60 * 60});
+  const user = result.rows.pop();
+  const token = Jwt.sign({userId: user.id}, Secret.secret, {expiresIn: 24 * 60 * 60});
 
   return {
+    user,
     token
   };
 }

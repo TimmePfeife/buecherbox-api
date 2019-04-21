@@ -24,7 +24,15 @@ async function createBookBox(bookBox) {
   return result.rows.pop();
 }
 
+async function getBookBoxesByUser(userId) {
+  const sql = `SELECT * FROM bookboxes WHERE userid = $1`;
+  const binds = [userId];
+  const result = await Db.query(sql, binds);
+  return result.rows;
+}
+
 module.exports = {
+  createBookBox,
   getBookBoxes,
-  createBookBox
+  getBookBoxesByUser
 };
