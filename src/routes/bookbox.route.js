@@ -1,26 +1,34 @@
+const Auth = require('../lib/auth');
 const BookBox = require('../lib/bookbox');
 const Express = require('express');
+const HttpStatus = require('http-status-codes');
 
 const Router = Express.Router();
 
-const INTERNAL_SERVER_ERROR = 500;
 
 Router.get('/', async (req, res) => {
   try {
     const result = await BookBox.getBookBoxes();
     res.json(result);
   } catch (e) {
-    res.sendStatus(INTERNAL_SERVER_ERROR );
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR );
   }
 });
 
 Router.post('/', async (req, res) => {
   try {
+    const auth = req.get("authorization");
+
+    if (!auth || !Auth.authenticateJwt(auth)) {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+
     await BookBox.createBookBox(req.body);
-    res.sendStatus(201);
+    res.sendStatus(HttpStatus.CREATED);
   } catch (e) {
     console.log(e);
-    res.sendStatus(INTERNAL_SERVER_ERROR)
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   }
 });
 
