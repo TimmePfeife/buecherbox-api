@@ -8,7 +8,7 @@ async function getBookBoxes() {
 
 async function createBookBox(bookBox) {
   const sql = `INSERT INTO bookboxes (userid, description, location, lat, lng, imgsrc, hint)
-               VALUES ($1, $2, $3, $4, $5, $6, $7)`;
+               VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
 
   const binds = [
     bookBox.userid,
@@ -20,7 +20,8 @@ async function createBookBox(bookBox) {
     bookBox.hint
   ];
 
-  await Db.query(sql, binds);
+  const result = await Db.query(sql, binds);
+  return result.rows.pop();
 }
 
 module.exports = {

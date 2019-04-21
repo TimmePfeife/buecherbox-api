@@ -24,8 +24,8 @@ Router.post('/', async (req, res) => {
       return;
     }
 
-    await BookBox.createBookBox(req.body);
-    res.sendStatus(HttpStatus.CREATED);
+    const result = await BookBox.createBookBox(req.body);
+    res.json(result).sendStatus(HttpStatus.CREATED);
   } catch (e) {
     console.log(e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
