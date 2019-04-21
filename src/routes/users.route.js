@@ -1,4 +1,4 @@
-const Auth = require('../lib/auth');
+const Users = require('../lib/users');
 const Express = require('express');
 const HttpStatus = require('http-status-codes');
 
@@ -12,8 +12,8 @@ Router.post('/', async (req, res) => {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
 
-    const credentials = Auth.getCredentials(auth);
-    const result = await Auth.authenticateUser(credentials[0], credentials[1]);
+    const credentials = Users.getCredentials(auth);
+    const result = await Users.authenticateUser(credentials[0], credentials[1]);
 
     if (result) {
       res.json(result);

@@ -1,4 +1,4 @@
-const Auth = require('../lib/auth');
+const Users = require('../lib/users');
 const BookBox = require('../lib/bookbox');
 const Express = require('express');
 const HttpStatus = require('http-status-codes');
@@ -19,7 +19,7 @@ Router.post('/', async (req, res) => {
   try {
     const auth = req.get("authorization");
 
-    if (!auth || !Auth.authenticateJwt(auth)) {
+    if (!auth || !Users.authenticateJwt(auth)) {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
       return;
     }
