@@ -8,6 +8,14 @@ function authenticateJwt(jwt) {
   return Jwt.verify(token, Secret.secret);
 }
 
+function createJwt() {
+  const payload = {
+    timestamp: Math.round((new Date()).getTime() / 1000)
+  };
+
+  return Jwt.sign(payload, Secret.secret, {expiresIn: 24 * 60 * 60});
+}
+
 async function authenticateUser(username, password) {
   const sql = `SELECT *
                FROM Users
@@ -24,7 +32,7 @@ async function authenticateUser(username, password) {
   if (!result.rows.length) return null;
 
   const user = result.rows.pop();
-  const token = Jwt.sign({userId: user.id}, Secret.secret, {expiresIn: 24 * 60 * 60});
+  const token = createJwt();
 
   return {
     user,
@@ -52,6 +60,7 @@ function getCredentials(auth) {
 
 module.exports = {
   authenticateJwt,
+  createJwt,
   authenticateUser,
   createUser,
   getCredentials

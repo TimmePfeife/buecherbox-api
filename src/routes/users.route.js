@@ -14,12 +14,12 @@ Router.post('/', async (req, res) => {
     }
 
     const credentials = Users.getCredentials(auth);
-    const user = req.body;
-    const newUser = await Users.createUser(user, credentials);
 
-    delete newUser.password;
+    const user = await Users.createUser(req.body, credentials);
+    user.token = Users.createJwt();
+    delete user.password;
 
-    res.status(HttpStatus.CREATED).json(newUser);
+    res.status(HttpStatus.CREATED).json(user);
   } catch (e) {
     console.log(e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
