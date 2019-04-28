@@ -33,16 +33,16 @@ async function authenticateUser(username, password) {
 }
 
 async function createUser(user, credentials) {
-  const sql = `INSERT INTO Users (username, email, password)
-               VALUES ($1, $2, crypt($3, gen_salt('bf'))) RETURNING *`;
+  const sql = `INSERT INTO Users (username, password)
+               VALUES ($1, crypt($2, gen_salt('bf'))) RETURNING *`;
 
   const binds = [
     credentials[0],
-    user.email,
     credentials[1]
   ];
 
-  await Db.query(sql, binds);
+  const result = await Db.query(sql, binds);
+  return result.rows[0];
 }
 
 function getCredentials(auth) {

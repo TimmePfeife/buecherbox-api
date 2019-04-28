@@ -15,8 +15,11 @@ Router.post('/', async (req, res) => {
 
     const credentials = Users.getCredentials(auth);
     const user = req.body;
-    await Users.createUser(user, credentials);
-    res.sendStatus(HttpStatus.CREATED);
+    const newUser = await Users.createUser(user, credentials);
+
+    delete newUser.password;
+
+    res.status(HttpStatus.CREATED).json(newUser);
   } catch (e) {
     console.log(e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -60,6 +63,10 @@ Router.get('/bookboxes', async (req, res) => {
     res.json(result);
   } catch (e) {
     console.log(e);
+    if (e.name === 'TokenExpiredError') {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   }
 });
