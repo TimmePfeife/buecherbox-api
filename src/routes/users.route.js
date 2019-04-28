@@ -65,4 +65,16 @@ Router.get('/bookboxes', Auth, async (req, res) => {
   }
 });
 
+Router.get('/:id', Auth, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await Users.getUser(userId);
+    delete user.password;
+    res.json(user);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+});
+
 module.exports = Router;

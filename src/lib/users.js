@@ -2,6 +2,11 @@ const Db = require('./db');
 const Jwt = require('jsonwebtoken');
 const Secret = require('../config/secret');
 
+function getCredentials(auth) {
+  const token = auth.split(" ")[1];
+  return Buffer.from(token, 'base64').toString('ascii').split(':');
+}
+
 function authenticateJwt(jwt) {
   if (!jwt) return null;
   const token = jwt.split(" ")[1];
@@ -53,9 +58,15 @@ async function createUser(user, credentials) {
   return result.rows[0];
 }
 
-function getCredentials(auth) {
-  const token = auth.split(" ")[1];
-  return Buffer.from(token, 'base64').toString('ascii').split(':');
+async function getUser (userId) {
+  const sql = `SELECT * from Users where id = $1`;
+
+  const binds = [
+    userId
+  ];
+
+  const result = await Db.query(sql, binds);
+  return result.rows[0];
 }
 
 module.exports = {
@@ -63,5 +74,6 @@ module.exports = {
   createJwt,
   authenticateUser,
   createUser,
-  getCredentials
+  getCredentials,
+  getUser
 };
