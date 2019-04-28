@@ -1,3 +1,4 @@
+const Auth = require('../middleware/auth');
 const BookBox = require('../lib/bookbox');
 const Express = require('express');
 const HttpStatus = require('http-status-codes');
@@ -28,17 +29,18 @@ Router.post('/', async (req, res) => {
 
 Router.post('/auth', async (req, res) => {
   try {
-    const auth = req.get("authorization");
+    const token = req.get("authorization");
 
-    if (!auth) {
+    if (!token) {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
 
-    const credentials = Users.getCredentials(auth);
+    const credentials = Users.getCredentials(token);
     const result = await Users.authenticateUser(credentials[0], credentials[1]);
 
     if (result) {
-      res.json({token:result.token});
+      delete result.user.password;
+      res.json(result);
     } else {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
@@ -48,16 +50,8 @@ Router.post('/auth', async (req, res) => {
   }
 });
 
-Router.get('/bookboxes', async (req, res) => {
+Router.get('/bookboxes', Auth, async (req, res) => {
   try {
-    const auth = req.get("authorization");
-
-    const user = Users.authenticateJwt(auth);
-    if (!auth || !user) {
-      res.sendStatus(HttpStatus.UNAUTHORIZED);
-      return;
-    }
-
     const result = await BookBox.getBookBoxesByUser(user.userId);
 
     res.json(result);

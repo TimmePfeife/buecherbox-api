@@ -1,3 +1,4 @@
+const Auth = require('../middleware/auth');
 const Users = require('../lib/users');
 const BookBox = require('../lib/bookbox');
 const Express = require('express');
@@ -32,18 +33,9 @@ Router.post('/', async (req, res) => {
   }
 });
 
-Router.get('/user/:id', async (req, res) => {
+Router.get('/user/:id', Auth, async (req, res) => {
   try {
-    const auth = req.get("authorization");
     const userId = req.params.id;
-
-    const user = Users.authenticateJwt(auth);
-
-    if (!auth || !user) {
-      res.sendStatus(HttpStatus.UNAUTHORIZED);
-      return;
-    }
-
     const result = await BookBox.getBookBoxesByUser(userId);
 
     res.json(result);
