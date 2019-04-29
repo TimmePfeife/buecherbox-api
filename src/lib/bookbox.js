@@ -25,14 +25,27 @@ async function createBookBox(bookBox) {
 }
 
 async function getBookBoxesByUser(userId) {
-  const sql = `SELECT * FROM bookboxes WHERE userid = $1`;
+  const sql = `SELECT *
+               FROM bookboxes
+               WHERE userid = $1`;
   const binds = [userId];
   const result = await Db.query(sql, binds);
+  return result.rows;
+}
+
+async function getFavoritesbyUser(userId) {
+  const sql = `SELECT *
+               FROM bookboxes
+               WHERE id IN (SELECT bookboxid FROM favorites WHERE userid = $1)`;
+
+  const binds = [userId];
+  const result = await Db.query(sql,binds);
   return result.rows;
 }
 
 module.exports = {
   createBookBox,
   getBookBoxes,
-  getBookBoxesByUser
+  getBookBoxesByUser,
+  getFavoritesbyUser
 };

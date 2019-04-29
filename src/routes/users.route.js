@@ -77,4 +77,35 @@ Router.get('/:id', Auth, async (req, res) => {
   }
 });
 
+Router.get('/:id/bookboxes', Auth, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const result = await BookBox.getBookBoxesByUser(userId);
+    res.json(result);
+  } catch (e) {
+    console.log(e);
+    if (e.name === 'TokenExpiredError') {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+});
+
+Router.get('/:id/favorites', Auth, async (req, res) => {
+  try {
+    // TODO: BenutzerId abgleichen
+    const userId = req.params.id;
+    const result = await BookBox.getFavoritesbyUser(userId);
+    res.json(result);
+  } catch (e) {
+    console.log(e);
+    if (e.name === 'TokenExpiredError') {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+});
+
 module.exports = Router;
