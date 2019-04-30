@@ -13,9 +13,10 @@ function authenticateJwt(jwt) {
   return Jwt.verify(token, Secret.secret);
 }
 
-function createJwt() {
+function createJwt(userId) {
   const payload = {
-    timestamp: Math.round((new Date()).getTime() / 1000)
+    timestamp: Math.round((new Date()).getTime() / 1000),
+    id: userId
   };
 
   return Jwt.sign(payload, Secret.secret, {expiresIn: 24 * 60 * 60});
@@ -37,7 +38,7 @@ async function authenticateUser(username, password) {
   if (!result.rows.length) return null;
 
   const user = result.rows.pop();
-  const token = createJwt();
+  const token = createJwt(user.id);
 
   return {
     user,

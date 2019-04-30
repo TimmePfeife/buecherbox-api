@@ -4,11 +4,11 @@ const HttpStatus = require('http-status-codes');
 module.exports = function auth(req, res, next) {
   try {
     const token = req.get("authorization");
-
-    const user = Users.authenticateJwt(token);
-    if (!token || !user) {
+    const userToken = Users.authenticateJwt(token);
+    if (!token || !userToken) {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
     } else {
+      req.token = userToken;
       next();
     }
   } catch (e) {

@@ -17,7 +17,7 @@ Router.post('/', async (req, res) => {
     const credentials = Users.getCredentials(auth);
 
     const user = await Users.createUser(req.body, credentials);
-    user.token = Users.createJwt();
+    user.token = Users.createJwt(user.id);
     delete user.password;
 
     res.status(HttpStatus.CREATED).json(user);
@@ -50,21 +50,6 @@ Router.post('/auth', async (req, res) => {
   }
 });
 
-Router.get('/bookboxes', Auth, async (req, res) => {
-  try {
-    const result = await BookBox.getBookBoxesByUser(user.userId);
-
-    res.json(result);
-  } catch (e) {
-    console.log(e);
-    if (e.name === 'TokenExpiredError') {
-      res.sendStatus(HttpStatus.UNAUTHORIZED);
-      return;
-    }
-    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  }
-});
-
 Router.get('/:id', Auth, async (req, res) => {
   try {
     const userId = req.params.id;
@@ -94,8 +79,13 @@ Router.get('/:id/bookboxes', Auth, async (req, res) => {
 
 Router.get('/:id/favorites', Auth, async (req, res) => {
   try {
-    // TODO: BenutzerId abgleichen
-    const userId = req.params.id;
+    const userId = parseInt(req.params.id);
+
+    if (userId !== req.token.id) {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+
     const result = await BookBox.getFavoritesbyUser(userId);
     res.json(result);
   } catch (e) {
