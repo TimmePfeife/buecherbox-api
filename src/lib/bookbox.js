@@ -1,12 +1,12 @@
 const Db = require('./db');
 
-async function getBookBoxes() {
+async function getBookBoxes () {
   const sql = 'SELECT * FROM bookboxes';
   const result = await Db.query(sql);
   return result.rows;
 }
 
-async function createBookBox(bookBox) {
+async function createBookBox (bookBox) {
   const sql = `INSERT INTO bookboxes (userid, description, location, lat, lng, imgsrc, hint)
                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
 
@@ -24,7 +24,7 @@ async function createBookBox(bookBox) {
   return result.rows.pop();
 }
 
-async function getBookBoxesByUser(userId) {
+async function getBookBoxesByUser (userId) {
   const sql = `SELECT *
                FROM bookboxes
                WHERE userid = $1`;
@@ -33,13 +33,13 @@ async function getBookBoxesByUser(userId) {
   return result.rows;
 }
 
-async function getFavoritesbyUser(userId) {
+async function getFavoritesbyUser (userId) {
   const sql = `SELECT *
                FROM bookboxes
                WHERE id IN (SELECT bookboxid FROM favorites WHERE userid = $1)`;
 
   const binds = [userId];
-  const result = await Db.query(sql,binds);
+  const result = await Db.query(sql, binds);
   return result.rows;
 }
 

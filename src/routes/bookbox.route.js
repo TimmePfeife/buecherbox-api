@@ -7,14 +7,14 @@ const Multer = require('multer');
 
 const Router = Express.Router();
 
-const Upload = Multer({dest: 'uploads/'});
+const Upload = Multer({ dest: 'uploads/' });
 
 Router.get('/', async (req, res) => {
   try {
     const result = await BookBox.getBookBoxes();
     res.json(result);
   } catch (e) {
-    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR );
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
 

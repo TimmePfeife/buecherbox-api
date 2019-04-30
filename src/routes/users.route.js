@@ -8,7 +8,7 @@ const Router = Express.Router();
 
 Router.post('/', async (req, res) => {
   try {
-    const auth = req.get("authorization");
+    const auth = req.get('authorization');
 
     if (!auth) {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
@@ -29,7 +29,7 @@ Router.post('/', async (req, res) => {
 
 Router.post('/auth', async (req, res) => {
   try {
-    const token = req.get("authorization");
+    const token = req.get('authorization');
 
     if (!token) {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
