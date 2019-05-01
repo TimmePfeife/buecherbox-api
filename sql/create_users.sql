@@ -2,7 +2,8 @@ CREATE TABLE Users
 (
     id       SERIAL PRIMARY KEY,
     username VARCHAR(20) UNIQUE NOT NULL,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE
 )
 
 -- INSERT INTO users (email, password) VALUES (
