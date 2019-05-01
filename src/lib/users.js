@@ -1,6 +1,5 @@
 const Db = require('./db');
 const Jwt = require('jsonwebtoken');
-const Secret = require('../config/secret');
 
 function getCredentials (auth) {
   const token = auth.split(' ')[1];
@@ -10,7 +9,7 @@ function getCredentials (auth) {
 function authenticateJwt (jwt) {
   if (!jwt) return null;
   const token = jwt.split(' ')[1];
-  return Jwt.verify(token, Secret.secret);
+  return Jwt.verify(token, process.env.JWT_SECRET);
 }
 
 function createJwt (userId) {
@@ -19,7 +18,7 @@ function createJwt (userId) {
     id: userId
   };
 
-  return Jwt.sign(payload, Secret.secret, { expiresIn: 24 * 60 * 60 });
+  return Jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 24 * 60 * 60 });
 }
 
 async function authenticateUser (username, password) {
