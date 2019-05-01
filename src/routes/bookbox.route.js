@@ -1,9 +1,10 @@
 const Auth = require('../middleware/auth');
-const Users = require('../lib/users');
 const BookBox = require('../lib/bookbox');
 const Express = require('express');
 const HttpStatus = require('http-status-codes');
+const Logger = require('../lib/logger');
 const Multer = require('multer');
+const Users = require('../lib/users');
 
 const Router = Express.Router();
 
@@ -14,19 +15,20 @@ Router.get('/', async (req, res) => {
     const result = await BookBox.getBookBoxes();
     res.json(result);
   } catch (e) {
+    Logger.error(e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
 
 Router.post('/', Auth, Upload.single('file'), async (req, res) => {
   try {
-    console.log(req.file);
-    console.log(req.body.lng);
+    Logger.debug(req.file);
+    Logger.debug(req.body.lng);
     // const result = await BookBox.createBookBox(req.body);
     const result = {};
     res.status(HttpStatus.CREATED).json(result);
   } catch (e) {
-    console.log(e);
+    Logger.error(e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   }
 });
@@ -38,7 +40,7 @@ Router.get('/user/:id', Auth, async (req, res) => {
 
     res.json(result);
   } catch (e) {
-    console.log(e);
+    Logger.error(e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   }
 });

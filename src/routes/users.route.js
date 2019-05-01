@@ -2,6 +2,7 @@ const Auth = require('../middleware/auth');
 const BookBox = require('../lib/bookbox');
 const Express = require('express');
 const HttpStatus = require('http-status-codes');
+const Logger = require('../lib/logger');
 const Users = require('../lib/users');
 
 const Router = Express.Router();
@@ -22,7 +23,7 @@ Router.post('/', async (req, res) => {
 
     res.status(HttpStatus.CREATED).json(user);
   } catch (e) {
-    console.log(e);
+    Logger.error(e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
@@ -45,7 +46,7 @@ Router.post('/auth', async (req, res) => {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
   } catch (e) {
-    console.log(e);
+    Logger.error(e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
@@ -57,7 +58,17 @@ Router.get('/:id', Auth, async (req, res) => {
     delete user.password;
     res.json(user);
   } catch (e) {
-    console.log(e);
+    Logger.error(e);
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+});
+
+// TODO Nutzer löschen
+Router.delete('/:id', async (req, res) => {
+  try {
+    res.sendStatus(HttpStatus.OK);
+  } catch (e) {
+    Logger.error(e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
@@ -68,7 +79,7 @@ Router.get('/:id/bookboxes', Auth, async (req, res) => {
     const result = await BookBox.getBookBoxesByUser(userId);
     res.json(result);
   } catch (e) {
-    console.log(e);
+    Logger.error(e);
     if (e.name === 'TokenExpiredError') {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
       return;
@@ -89,7 +100,7 @@ Router.get('/:id/favorites', Auth, async (req, res) => {
     const result = await BookBox.getFavoritesbyUser(userId);
     res.json(result);
   } catch (e) {
-    console.log(e);
+    Logger.error(e);
     if (e.name === 'TokenExpiredError') {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
       return;
