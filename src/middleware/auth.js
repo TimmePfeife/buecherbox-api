@@ -1,5 +1,6 @@
-const Users = require('../lib/users');
 const HttpStatus = require('http-status-codes');
+const Logger = require('../lib/logger');
+const Users = require('../lib/users');
 
 module.exports = function auth (req, res, next) {
   try {
@@ -12,7 +13,7 @@ module.exports = function auth (req, res, next) {
       next();
     }
   } catch (e) {
-    // TODO: Loggen
+    Logger.error('Authentication error', e);
     res.sendStatus(HttpStatus.UNAUTHORIZED);
   }
 };

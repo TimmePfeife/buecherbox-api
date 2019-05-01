@@ -1,9 +1,10 @@
+require('dotenv').config();
+
 const BodyParser = require('body-parser');
 const Cors = require('cors');
 const Express = require('express');
+const Logger = require('./src/lib/logger');
 const Routes = require('./src/routes');
-
-require('dotenv').config();
 
 const port = process.env.PORT || 3000;
 
@@ -18,4 +19,4 @@ App.use(BodyParser.urlencoded({
 
 App.use(Routes);
 
-App.listen(port, () => console.log(`Server started on port ${port}`));
+App.listen(port, () => Logger.info(`Server started on port ${port}`));
