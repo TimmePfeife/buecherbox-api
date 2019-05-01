@@ -63,9 +63,17 @@ Router.get('/:id', Auth, async (req, res) => {
   }
 });
 
-// TODO Nutzer löschen
-Router.delete('/:id', async (req, res) => {
+Router.delete('/:id', Auth, async (req, res) => {
   try {
+    const userId = parseInt(req.params.id);
+
+    if (userId !== req.token.id) {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+
+    await Users.deleteUser(userId);
+
     res.sendStatus(HttpStatus.OK);
   } catch (e) {
     Logger.error(e);

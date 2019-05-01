@@ -69,11 +69,22 @@ async function getUser (userId) {
   return result.rows[0];
 }
 
+async function deleteUser (userId) {
+  const sql = `UPDATE users SET deleted = true WHERE id = $1`;
+
+  const binds = [
+    userId
+  ];
+
+  await Db.query(sql, binds);
+}
+
 module.exports = {
   authenticateJwt,
   createJwt,
   authenticateUser,
   createUser,
   getCredentials,
-  getUser
+  getUser,
+  deleteUser
 };
