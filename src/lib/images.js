@@ -1,6 +1,7 @@
 const Crypto = require('crypto');
 const Db = require('../lib/db');
 const Fs = require('fs');
+const Jimp = require('jimp');
 const Path = require('path');
 
 function generateFilename (file) {
@@ -36,7 +37,12 @@ async function saveThumbnail (file) {
   }
 
   path = Path.join(process.env.UPLOAD_DIR, 'thumbnail', file.filename);
-  await Fs.writeFileSync(path, file.buffer);
+
+  const image = await Jimp.read(file.path);
+
+  await image.resize(200, 200);
+  await image.write(path);
+
   file.thumbnail = path;
 }
 
