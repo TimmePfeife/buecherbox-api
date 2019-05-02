@@ -55,7 +55,7 @@ async function createUser (user, credentials) {
   ];
 
   const result = await Db.query(sql, binds);
-  return result.rows[0];
+  return result.rows.length ? result.rows[0] : null;
 }
 
 async function getUser (userId) {
