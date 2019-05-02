@@ -18,6 +18,9 @@ const fileFilter = (req, file, cb) => {
 
 const options = {
   dest: process.env.UPLOAD_DIR,
+  limits: {
+    fileSize: process.env.UPLOAD_SIZE * 1024 * 1024
+  },
   fileFilter,
   storage: Multer.memoryStorage()
 };
