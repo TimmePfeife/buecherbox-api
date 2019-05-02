@@ -39,7 +39,7 @@ Router.post('/auth', async (req, res) => {
     const credentials = Users.getCredentials(token);
     const result = await Users.authenticateUser(credentials[0], credentials[1]);
 
-    if (result) {
+    if (result && result.user && !result.user.deleted) {
       delete result.user.password;
       res.json(result);
     } else {
@@ -55,7 +55,14 @@ Router.get('/:id', Auth, async (req, res) => {
   try {
     const userId = req.params.id;
     const user = await Users.getUser(userId);
+
+    if (!user || user.deleted) {
+      res.sendStatus(HttpStatus.NOT_FOUND);
+      return
+    }
+
     delete user.password;
+
     res.json(user);
   } catch (e) {
     Logger.error(e);

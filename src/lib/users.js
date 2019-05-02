@@ -36,8 +36,8 @@ async function authenticateUser (username, password) {
 
   if (!result.rows.length) return null;
 
-  const user = result.rows.pop();
-  const token = createJwt(user.id);
+  const user = result.rows.length ? result.rows[0] : null;
+  const token = user ? createJwt(user.id) : '';
 
   return {
     user,
@@ -66,7 +66,8 @@ async function getUser (userId) {
   ];
 
   const result = await Db.query(sql, binds);
-  return result.rows[0];
+
+  return result.rows.length ? result.rows[0] : null;
 }
 
 async function deleteUser (userId) {
