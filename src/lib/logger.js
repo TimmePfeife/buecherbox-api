@@ -11,6 +11,7 @@ const customTimestamp = { format: 'YYYY-MM-DD HH:mm:ss' };
 const customFormat = printf(({ timestamp, label, level, message, ...payload }) => {
   let payloadStr = JSON.stringify(payload, undefined, 2);
   payloadStr = payloadStr === '{}' ? '' : payloadStr;
+  payloadStr = payloadStr ? '\n' + payloadStr : '';
 
   return `${timestamp} [${label}] ${level}: ${message} ${payloadStr}`;
 });
