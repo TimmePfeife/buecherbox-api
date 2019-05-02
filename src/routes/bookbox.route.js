@@ -2,13 +2,12 @@ const Auth = require('../middleware/auth');
 const BookBox = require('../lib/bookbox');
 const Express = require('express');
 const HttpStatus = require('http-status-codes');
+const Images = require('../lib/images');
 const Logger = require('../lib/logger');
-const Multer = require('multer');
+const Upload = require('../middleware/upload');
 const Users = require('../lib/users');
 
 const Router = Express.Router();
-
-const Upload = Multer({ dest: 'uploads/' });
 
 Router.get('/', async (req, res) => {
   try {
@@ -22,8 +21,7 @@ Router.get('/', async (req, res) => {
 
 Router.post('/', Auth, Upload.single('file'), async (req, res) => {
   try {
-    Logger.debug(req.file);
-    Logger.debug(req.body.lng);
+    const image = await Images.save(req.file);
     // const result = await BookBox.createBookBox(req.body);
     const result = {};
     res.status(HttpStatus.CREATED).json(result);
