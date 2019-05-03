@@ -17,7 +17,7 @@ Router.post('/', async (req, res) => {
 
     const credentials = Users.getCredentials(auth);
 
-    const user = await Users.createUser(req.body, credentials);
+    const user = await Users.createUser(credentials[0], credentials[1]);
     user.token = Users.createJwt(user.id);
     delete user.password;
 

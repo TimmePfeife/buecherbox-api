@@ -45,13 +45,15 @@ async function authenticateUser (username, password) {
   };
 }
 
-async function createUser (user, credentials) {
+async function createUser (username, password) {
+  if (!username || !password) return null;
+
   const sql = `INSERT INTO Users (username, password)
                VALUES ($1, crypt($2, gen_salt('bf'))) RETURNING *`;
 
   const binds = [
-    credentials[0],
-    credentials[1]
+    username,
+    password
   ];
 
   const result = await Db.query(sql, binds);
