@@ -3,7 +3,13 @@ const Data = require('../resources/data');
 const Faker = require('faker');
 const Users = require('../../src/lib/users');
 
+const Db = require('../../src/lib/db');
+
 describe('users', () => {
+  before(async () => {
+    await Db.query(Db.sqlScripts['truncate_tables.sql']);
+  });
+
   it('createUser(user, credentials)', async () => {
     for (let i = 0; i < Data.entries; i++) {
       const user = Data.users[i];

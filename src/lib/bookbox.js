@@ -7,6 +7,8 @@ async function getBookBoxes () {
 }
 
 async function createBookBox (bookBox) {
+  if (!bookBox) return null;
+
   const sql = `INSERT INTO bookboxes (userid, description, location, lat, lng, imgsrc, hint)
                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
 
@@ -21,7 +23,7 @@ async function createBookBox (bookBox) {
   ];
 
   const result = await Db.query(sql, binds);
-  return result.rows.pop();
+  return result.rows.length ? result.rows[0] : null;
 }
 
 async function getBookBoxesByUser (userId) {
