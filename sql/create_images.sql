@@ -8,4 +8,4 @@ CREATE TABLE Images
     thumbnail   VARCHAR(260)              NOT NULL,
     size        INT                       NOT NULL,
     created     date DEFAULT current_date NOT NULL
-)
+);
