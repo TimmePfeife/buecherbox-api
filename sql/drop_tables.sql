@@ -1,4 +1,4 @@
-DROP TABLE favorites;
-DROP TABLE bookboxes;
-DROP TABLE images;
-DROP TABLE users;
+DROP TABLE IF EXISTS favorites;
+DROP TABLE IF EXISTS bookboxes;
+DROP TABLE IF EXISTS images;
+DROP TABLE IF EXISTS users;
