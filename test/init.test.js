@@ -4,6 +4,7 @@ require('dotenv')
   });
 
 const Db = require('../src/lib/db');
+const Data = require('./resources/data');
 const Fs = require('fs');
 const Path = require('path');
 
@@ -29,5 +30,5 @@ before(async () => {
   await Db.query(sql['create_bookboxes.sql']);
   await Db.query(sql['create_favorites.sql']);
 
-  await Db.query(sql['init_testdata.sql']);
+  Data.init();
 });
