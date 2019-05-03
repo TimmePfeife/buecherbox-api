@@ -10,4 +10,4 @@ CREATE TABLE BookBoxes
     hint        TEXT,
     created     date DEFAULT current_date,
     updated     date
-)
+);
