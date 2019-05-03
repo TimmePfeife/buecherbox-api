@@ -6,7 +6,6 @@ services:
 before_script:
   - psql -c 'CREATE DATABASE buecherbox_test_db;' -U postgres
   - psql -c 'CREATE EXTENSION pgcrypto;' -U postgres
-  - cd ./nodejs
 script:
   - npm install
   - npm run postinstall
