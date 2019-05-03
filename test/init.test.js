@@ -28,6 +28,4 @@ before(async () => {
   await Db.query(sql['create_images.sql']);
   await Db.query(sql['create_bookboxes.sql']);
   await Db.query(sql['create_favorites.sql']);
-
-  await Db.query(sql['init_testdata.sql']);
 });
