@@ -124,4 +124,25 @@ Router.get('/:id/favorites', Auth, async (req, res) => {
   }
 });
 
+Router.post('/:id/favorites', Auth, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+
+    if (userId !== req.token.id) {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+
+    const result = await BookBox.getFavoritesbyUser(userId);
+    res.json(result);
+  } catch (e) {
+    Logger.error(e);
+    if (e.name === 'TokenExpiredError') {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+});
+
 module.exports = Router;

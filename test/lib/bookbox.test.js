@@ -3,15 +3,10 @@ const Bookbox = require('../../src/lib/bookbox');
 const Data = require('../resources/data');
 const { expect } = require('chai').use(chaiAsPromised);
 const Faker = require('faker');
-const Users = require('../../src/lib/users');
 
 before(async () => {
-  for (let i = 0; i < Data.entries; i++) {
-    const user = Data.users[i];
-    const username = user.username;
-    const password = user.password;
-    await Users.createUser(username, password);
-  }
+  await Data.drop();
+  await Data.initUsers();
 });
 
 describe('bookbox', () => {
@@ -51,9 +46,25 @@ describe('bookbox', () => {
     }
   });
 
-  // it('createBookBox(bookBox)', async () => {
-  //   for (let i = 0; i < Data.entries; i++) {
-  //
-  //   }
-  // });
+  it('getBookBoxesByUser(userId)', async () => {
+    for (let i = 0; i < Data.entries; i++) {
+      const user = Data.users[i];
+      const bookboxList = await Bookbox.getBookBoxesByUser(user.id);
+      const ids = bookboxList.map(box => box.id);
+
+      expect(ids).to.eql(user.created);
+    }
+  });
+
+  it('getFavoritesbyUser(userId)', async () => {
+    await Data.initFavorites();
+
+    for (let i = 0; i < Data.entries; i++) {
+      const user = Data.users[i];
+      const favoritesList = await Bookbox.getFavoritesbyUser(user.id);
+      const ids = favoritesList.map(box => box.id);
+
+      expect(ids).to.eql(user.favorites.map(fav => fav.bookboxid));
+    }
+  });
 });

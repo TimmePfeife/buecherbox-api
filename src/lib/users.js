@@ -61,7 +61,9 @@ async function createUser (username, password) {
 }
 
 async function getUser (userId) {
-  const sql = `SELECT * from Users where id = $1`;
+  const sql = `SELECT *
+               from Users
+               where id = $1`;
 
   const binds = [
     userId
@@ -73,13 +75,55 @@ async function getUser (userId) {
 }
 
 async function deleteUser (userId) {
-  const sql = `UPDATE users SET deleted = true WHERE id = $1`;
+  const sql = `UPDATE users
+               SET deleted = true
+               WHERE id = $1`;
 
   const binds = [
     userId
   ];
 
   await Db.query(sql, binds);
+}
+
+async function addFavorite (userId, bookboxId) {
+  const sql = `INSERT INTO favorites (userid, bookboxid)
+               VALUES ($1, $2) RETURNING *`;
+
+  const binds = [
+    userId,
+    bookboxId
+  ];
+
+  const result = await Db.query(sql, binds);
+
+  return result.rows.length ? result.rows[0] : null;
+}
+
+async function deleteFavorite (id) {
+  const sql = `DELETE
+               FROM favorites
+               WHERE id = $1`;
+
+  const binds = [
+    id
+  ];
+
+  await Db.query(sql, binds);
+}
+
+async function getFavorites (userId) {
+  const sql = `SELECT *
+               from favorites
+               where userid = $1`;
+
+  const binds = [
+    userId
+  ];
+
+  const result = await Db.query(sql, binds);
+
+  return result.rows;
 }
 
 module.exports = {
@@ -89,5 +133,8 @@ module.exports = {
   createUser,
   getCredentials,
   getUser,
-  deleteUser
+  deleteUser,
+  addFavorite,
+  deleteFavorite,
+  getFavorites
 };
