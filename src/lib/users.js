@@ -8,11 +8,18 @@ function getCredentials (auth) {
 
 function authenticateJwt (jwt) {
   if (!jwt) return null;
-  const token = jwt.split(' ')[1];
+
+  const header = jwt.split(' ');
+
+  if (header[0].toLowerCase() !== 'bearer') return null;
+
+  const token = header[1];
   return Jwt.verify(token, process.env.JWT_SECRET);
 }
 
 function createJwt (userId) {
+  if (!userId) return '';
+
   const payload = {
     timestamp: Math.round((new Date()).getTime() / 1000),
     id: userId

@@ -2,9 +2,8 @@ const { expect } = require('chai');
 const Data = require('../resources/data');
 const Faker = require('faker');
 const Users = require('../../src/lib/users');
-const Db = require('../../src/lib/db');
 
-describe('users', () => {
+describe('lib/users', () => {
   before(async () => {
     await Data.drop();
   });
