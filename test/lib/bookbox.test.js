@@ -2,14 +2,13 @@ const chaiAsPromised = require('chai-as-promised');
 const Bookbox = require('../../src/lib/bookbox');
 const Data = require('../resources/data');
 const { expect } = require('chai').use(chaiAsPromised);
-const Faker = require('faker');
 
-before(async () => {
-  await Data.drop();
-  await Data.initUsers();
-});
+describe('lib/bookbox', () => {
+  before(async () => {
+    await Data.drop();
+    await Data.initUsers();
+  });
 
-describe('bookbox', () => {
   it('createBookBox(bookBox)', async () => {
     for (let i = 0; i < Data.entries; i++) {
       const bookbox = Data.bookboxes[i];
