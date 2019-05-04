@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha --recursive",
-    "coverage": "NODE_ENV=test nyc mocha --recursive",
+    "test": "NODE_ENV=test nyc --reporter=html --reporter=text mocha --recursive",
+    "coverage": "NODE_ENV=test nyc report --reporter=text-lcov | coveralls",
     "startpsql": "brew services start postgresql",
     "stoppsql": "brew services stop postgresql"
   },
