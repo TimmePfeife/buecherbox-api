@@ -46,6 +46,17 @@ async function dropUsers () {
   await Db.query(`TRUNCATE TABLE users RESTART IDENTITY CASCADE`);
 }
 
+function getUser () {
+  return {
+    id: -1,
+    username: Faker.internet.userName().substring(0, 20),
+    password: Faker.internet.password(),
+    deleted: Faker.random.boolean(),
+    created: [],
+    favorites: []
+  };
+}
+
 function _initBookboxes () {
   for (let i = 0; i < entries; i++) {
     const creatorId = Math.floor(Math.random() * (entries - 1) + 1);
@@ -102,6 +113,7 @@ async function initFavorites () {
 module.exports = {
   drop,
   dropUsers,
+  getUser,
   init,
   initBookboxes,
   initUsers,

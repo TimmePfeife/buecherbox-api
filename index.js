@@ -20,3 +20,5 @@ App.use(BodyParser.urlencoded({
 App.use(Routes);
 
 App.listen(port, () => Logger.info(`Server started on port ${port}`));
+
+module.exports = App;

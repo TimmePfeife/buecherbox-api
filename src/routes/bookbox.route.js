@@ -5,7 +5,6 @@ const HttpStatus = require('http-status-codes');
 const Images = require('../lib/images');
 const Logger = require('../lib/logger');
 const Upload = require('../middleware/upload');
-const Users = require('../lib/users');
 
 const Router = Express.Router();
 

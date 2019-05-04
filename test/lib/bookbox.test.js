@@ -1,7 +1,6 @@
-const chaiAsPromised = require('chai-as-promised');
 const Bookbox = require('../../src/lib/bookbox');
 const Data = require('../resources/data');
-const { expect } = require('chai').use(chaiAsPromised);
+const { expect } = require('chai');
 
 describe('lib/bookbox', () => {
   before(async () => {

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test nyc --reporter=html --reporter=text mocha --recursive",
+    "test": "NODE_ENV=test nyc --reporter=html --reporter=text mocha --recursive --timeout 5000 --exit",
     "coverage": "NODE_ENV=test nyc report --reporter=text-lcov | coveralls",
     "startpsql": "brew services start postgresql",
     "stoppsql": "brew services stop postgresql"
@@ -31,6 +31,7 @@
     "@types/mocha": "^5.2.6",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "chai-http": "^4.3.0",
     "coveralls": "^3.0.3",
     "cross-env": "^5.2.0",
     "eslint": "^5.16.0",
