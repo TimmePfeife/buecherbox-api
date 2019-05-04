@@ -19,14 +19,3 @@ before(async () => {
   await Data.init();
   init = true;
 });
-
-// beforeEach(async () => {
-//   console.log(count++);
-//
-//   // dont truncate after init
-//   if (init) {
-//     init = false;
-//     return;
-//   }
-//   await Db.query(sql['truncate_tables.sql']);
-// });

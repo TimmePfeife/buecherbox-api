@@ -2,12 +2,11 @@ const { expect } = require('chai');
 const Data = require('../resources/data');
 const Faker = require('faker');
 const Users = require('../../src/lib/users');
-
 const Db = require('../../src/lib/db');
 
 describe('users', () => {
   before(async () => {
-    await Db.query(Db.sqlScripts['truncate_tables.sql']);
+    await Data.drop();
   });
 
   it('createUser(user, credentials)', async () => {
@@ -105,6 +104,45 @@ describe('users', () => {
       expect(dbUser.id).to.equal(user.id);
       expect(dbUser.username).to.equal(user.username);
       expect(dbUser.deleted).to.equal(user.deleted);
+    }
+  });
+
+  it('addFavorite(userId, bookboxId)', async () => {
+    await Data.initBookboxes();
+
+    for (let i = 0; i < Data.entries; i++) {
+      const user = Data.users[i];
+
+      for (let j = 0; j < user.favorites.length; j++) {
+        const favorite = user.favorites[j];
+        const fav = await Users.addFavorite(user.id, favorite.bookboxid);
+        favorite.id = fav.id;
+      }
+    }
+  });
+
+  it('getFavorites(userId)', async () => {
+    for (let i = 0; i < Data.entries; i++) {
+      const user = Data.users[i];
+      const userFavorites = Data.favorites.filter(fav => fav.userid === user.id);
+
+      const favorites = await Users.getFavorites(user.id);
+      expect(favorites.length).to.equal(userFavorites.length);
+      expect(favorites).to.not.deep.include(userFavorites);
+    }
+  });
+
+  it('deleteFavorite(id)', async () => {
+    for (let i = 0; i < Data.entries; i++) {
+      const user = Data.users[i];
+
+      for (let j = 0; j < user.favorites.length; j++) {
+        await Users.deleteFavorite(user.favorites[j].id);
+      }
+
+      const favorites = await Users.getFavorites(user.id);
+
+      expect(favorites).to.be.empty;
     }
   });
 });
