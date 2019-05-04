@@ -63,3 +63,4 @@ fabric.properties
 # Custom
 /uploads/
 /logs/
+/.env*
