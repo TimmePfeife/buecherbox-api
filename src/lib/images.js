@@ -13,6 +13,8 @@ function generateFilename (file) {
 }
 
 async function save (file) {
+  if (!file) return null;
+
   const filename = generateFilename(file);
   file.filename = filename;
 
