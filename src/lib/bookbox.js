@@ -6,19 +6,19 @@ async function getBookBoxes () {
   return result.rows;
 }
 
-async function createBookBox (bookBox) {
+async function createBookBox (bookBox, image) {
   if (!bookBox) return null;
 
-  const sql = `INSERT INTO bookboxes (userid, description, location, lat, lng, imgsrc, hint)
+  const sql = `INSERT INTO bookboxes (userid, imgid, description, location, lat, lng, hint)
                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
 
   const binds = [
     bookBox.userid,
+    image ? image.id : null,
     bookBox.description,
     bookBox.location,
     bookBox.lat,
     bookBox.lng,
-    bookBox.imgsrc,
     bookBox.hint
   ];
 

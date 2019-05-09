@@ -21,8 +21,7 @@ Router.get('/', async (req, res) => {
 Router.post('/', Auth, Upload.single('file'), async (req, res) => {
   try {
     const image = await Images.save(req.file);
-    // const result = await BookBox.createBookBox(req.body);
-    const result = {};
+    const result = await BookBox.createBookBox(req.body, image);
     res.status(HttpStatus.CREATED).json(result);
   } catch (e) {
     Logger.error(e);
