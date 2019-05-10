@@ -1,6 +1,12 @@
 const Multer = require('multer');
 const Path = require('path');
 
+/**
+ * Allows only allowed file extensions for upload.
+ * @param req
+ * @param file
+ * @param cb
+ */
 const fileFilter = (req, file, cb) => {
   const allowedFiles = ['.jpg', '.png'];
 

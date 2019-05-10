@@ -6,6 +6,10 @@ const sql = {};
 const sqlDir = 'sql';
 const ignore = ['init_postgres.sql'];
 
+/**
+ * Reads the content of the sql scripts to use them later in code.
+ * Ignores the files listet in {@link ignore}.
+ */
 function readSql () {
   const scripts = Fs.readdirSync(sqlDir);
   for (let i = 0; i < scripts.length; i++) {

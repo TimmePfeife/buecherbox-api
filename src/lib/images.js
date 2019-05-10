@@ -4,6 +4,11 @@ const Fs = require('fs');
 const Jimp = require('jimp');
 const Path = require('path');
 
+/**
+ * Generates a random filename for a given image.
+ * @param {object} file
+ * @returns {string}
+ */
 function generateFilename (file) {
   const bytes = Crypto.randomBytes(32);
   const checksum = Crypto.createHash('sha256')
@@ -12,6 +17,12 @@ function generateFilename (file) {
   return checksum + file.ext;
 }
 
+/**
+ * Generates the filename and thumbnail of a given image
+ * and inserts the information into the database.
+ * @param {object} file
+ * @returns {Promise<null|Promise<null>>}
+ */
 async function save (file) {
   if (!file) return null;
 
@@ -32,6 +43,11 @@ async function save (file) {
   return createImage(file);
 }
 
+/**
+ * Generates a thumbnail for a given file.
+ * @param {object} file
+ * @returns {Promise<void>}
+ */
 async function saveThumbnail (file) {
   let path = Path.join(process.env.UPLOAD_DIR, 'thumbnail');
   if (!Fs.existsSync(path)) {
@@ -48,6 +64,11 @@ async function saveThumbnail (file) {
   file.thumbnail = path;
 }
 
+/**
+ * Inserts a new image into the database and returns the reult.
+ * @param {image} file
+ * @returns {Promise<null>}
+ */
 async function createImage (file) {
   const sql = `INSERT INTO images(filename,
                                   mimetype,
@@ -70,6 +91,11 @@ async function createImage (file) {
   return result.rows.length ? result.rows[0] : null;
 }
 
+/**
+ * Selects a image from the database.
+ * @param {number} imageId
+ * @returns {Promise<null>}
+ */
 async function getImage (imageId) {
   const sql = `SELECT * FROM images WHERE id = $1`;
 

@@ -4,6 +4,7 @@ require('winston-daily-rotate-file');
 
 const { combine, colorize, timestamp, label, printf, splat, errors } = format;
 
+// TODO use Module Name as Label (index.js right now for all modules)
 const customLabel = { label: Path.basename(process.mainModule.filename) };
 
 const customTimestamp = { format: 'YYYY-MM-DD HH:mm:ss' };

@@ -2,6 +2,15 @@ const HttpStatus = require('http-status-codes');
 const Logger = require('../lib/logger');
 const Users = require('../lib/users');
 
+/**
+ * Adds authentication to a route. The request needs an valid json web token
+ * to be processed further.
+ * @module Auth
+ * @function
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ */
 module.exports = function auth (req, res, next) {
   try {
     const token = req.get('authorization');
