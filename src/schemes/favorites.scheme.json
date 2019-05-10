@@ -1,0 +1,13 @@
+{
+  "$id": "favorites.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Favorites",
+  "type": "object",
+  "properties": {
+    "bookboxId": {
+      "type": "number",
+      "description": "Bookbox id."
+    }
+  },
+  "required": [ "bookboxId" ]
+}

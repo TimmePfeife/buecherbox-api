@@ -5,6 +5,7 @@ const HttpStatus = require('http-status-codes');
 const Images = require('../lib/images');
 const Logger = require('../lib/logger');
 const Upload = require('../middleware/upload');
+const Validation = require('../middleware/validation');
 
 const Router = Express.Router();
 
@@ -18,7 +19,7 @@ Router.get('/', async (req, res) => {
   }
 });
 
-Router.post('/', Auth, Upload.single('file'), async (req, res) => {
+Router.post('/', Auth, Upload.single('file'), Validation('bookbox'), async (req, res) => {
   try {
     const image = await Images.save(req.file);
     const result = await BookBox.createBookBox(req.body, image);

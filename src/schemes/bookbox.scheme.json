@@ -1,0 +1,33 @@
+{
+  "$id": "bookbox.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bookbox",
+  "type": "object",
+  "properties": {
+    "userid": {
+      "type": ["number", "string"],
+      "description": "User id of the creator."
+    },
+    "description": {
+      "type": "string",
+      "description": "Short description of the bookbox."
+    },
+    "lat": {
+      "type": ["number", "string"],
+      "description": "Latitude of the bookbox.",
+      "minimum": -90,
+      "maximum": 90
+    },
+    "lng": {
+      "type": ["number", "string"],
+      "description": "Longitude of the bookbox.",
+      "minimum": -180,
+      "maximum": 180
+    },
+    "hint": {
+      "type": "string",
+      "description": "Hints for a bookbox."
+    }
+  },
+  "required": [ "userid", "lat", "lng" ]
+}

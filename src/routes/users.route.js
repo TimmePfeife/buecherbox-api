@@ -4,6 +4,7 @@ const Express = require('express');
 const HttpStatus = require('http-status-codes');
 const Logger = require('../lib/logger');
 const Users = require('../lib/users');
+const Validation = require('../middleware/validation');
 
 const Router = Express.Router();
 
@@ -124,7 +125,7 @@ Router.get('/:id/favorites', Auth, async (req, res) => {
   }
 });
 
-Router.post('/:id/favorites', Auth, async (req, res) => {
+Router.post('/:id/favorites', Auth, Validation('favorites'), async (req, res) => {
   try {
     const userId = parseInt(req.params.id);
 
