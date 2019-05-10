@@ -9,5 +9,9 @@ CREATE TABLE BookBoxes
     imgSrc      VARCHAR(255),
     hint        TEXT,
     created     date DEFAULT current_date,
-    updated     date
+    updated     date,
+    CHECK (
+            lat >= -90 AND lat <= 90 AND
+            lng >= -180 AND lng <= 180
+        )
 );
