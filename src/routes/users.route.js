@@ -133,8 +133,8 @@ Router.post('/:id/favorites', Auth, async (req, res) => {
       return;
     }
 
-    const result = await BookBox.getFavoritesbyUser(userId);
-    res.json(result);
+    const favorite = await Users.addFavorite(userId, req.body.bookboxId);
+    res.status(HttpStatus.CREATED).json(favorite);
   } catch (e) {
     Logger.error(e);
     if (e.name === 'TokenExpiredError') {
