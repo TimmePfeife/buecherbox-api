@@ -4,7 +4,7 @@ CREATE TABLE Users
     username   VARCHAR(20) UNIQUE NOT NULL,
     password   TEXT               NOT NULL,
     deleted    BOOLEAN            NOT NULL DEFAULT FALSE,
-    created    date                        DEFAULT current_date,
-    updated    date,
-    last_login date
+    created    TIMESTAMP                   DEFAULT current_timestamp,
+    updated    TIMESTAMP,
+    last_login TIMESTAMP
 );

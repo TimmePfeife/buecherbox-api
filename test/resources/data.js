@@ -87,7 +87,7 @@ function _initBookboxes () {
       location: '',
       lat: parseFloat(Faker.address.latitude()),
       lng: parseFloat(Faker.address.longitude()),
-      imgsrc: '',
+      imgid: null,
       hint: Faker.lorem.lines()
     });
   }
