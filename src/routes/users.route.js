@@ -41,6 +41,7 @@ Router.post('/auth', async (req, res) => {
     const result = await Users.authenticateUser(credentials[0], credentials[1]);
 
     if (result && result.user && !result.user.deleted) {
+      await Users.setUserLastLogin(result.user.id);
       delete result.user.password;
       res.json(result);
     } else {

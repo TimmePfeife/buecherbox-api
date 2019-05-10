@@ -193,6 +193,23 @@ async function getFavorites (userId) {
   return result.rows;
 }
 
+/**
+ * Sets the last logon of the user in the database.
+ * @param userId
+ * @returns {Promise<void>}
+ */
+async function setUserLastLogin (userId) {
+  const sql = `UPDATE users
+               SET last_login = current_timestamp
+               WHERE id = $1`;
+
+  const binds = [
+    userId
+  ];
+
+  await Db.query(sql, binds);
+}
+
 module.exports = {
   authenticateJwt,
   createJwt,
@@ -203,5 +220,6 @@ module.exports = {
   deleteUser,
   addFavorite,
   deleteFavorite,
-  getFavorites
+  getFavorites,
+  setUserLastLogin
 };
