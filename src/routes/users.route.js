@@ -134,9 +134,38 @@ Router.post('/:id/favorites', Auth, Validation('favorites'), async (req, res) =>
       res.sendStatus(HttpStatus.UNAUTHORIZED);
       return;
     }
+    const bookboxId = req.body.bookboxId;
 
-    const favorite = await Users.addFavorite(userId, req.body.bookboxId);
+    let favorite = await Users.getFavorite(userId, bookboxId);
+    if (favorite) {
+      res.status(HttpStatus.SEE_OTHER).json(favorite);
+      return;
+    }
+
+    favorite = await Users.addFavorite(userId, bookboxId);
     res.status(HttpStatus.CREATED).json(favorite);
+  } catch (e) {
+    Logger.error(e);
+    if (e.name === 'TokenExpiredError') {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+});
+
+Router.delete('/:id/favorites', Auth, Validation('favorites'), async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+
+    if (userId !== req.token.id) {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+    const bookboxId = req.body.bookboxId;
+
+    await Users.deleteFavorite(userId, bookboxId);
+    res.sendStatus(HttpStatus.OK);
   } catch (e) {
     Logger.error(e);
     if (e.name === 'TokenExpiredError') {

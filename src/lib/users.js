@@ -162,13 +162,32 @@ async function addFavorite (userId, bookboxId) {
  * @param {number} id
  * @returns {Promise<void>}
  */
-async function deleteFavorite (id) {
+async function deleteFavoriteById (id) {
   const sql = `DELETE
                FROM favorites
                WHERE id = $1`;
 
   const binds = [
     id
+  ];
+
+  await Db.query(sql, binds);
+}
+
+/**
+ * Deletes an users favorite bookbox from the database.
+ * @param {number} userId
+ * @param {number} bookboxId
+ * @returns {Promise<void>}
+ */
+async function deleteFavorite (userId, bookboxId) {
+  const sql = `DELETE
+               FROM favorites
+               WHERE userid = $1 AND bookboxid = $2`;
+
+  const binds = [
+    userId,
+    bookboxId
   ];
 
   await Db.query(sql, binds);
@@ -210,6 +229,27 @@ async function setUserLastLogin (userId) {
   await Db.query(sql, binds);
 }
 
+/**
+ * Selects user favorite by userid and bookboxid from the database.
+ * @param {number} userId
+ * @param {number} bookboxId
+ * @returns {Promise<*>}
+ */
+async function getFavorite (userId, bookboxId) {
+  const sql = `SELECT *
+               from favorites
+               where userid = $1 AND bookboxid = $2`;
+
+  const binds = [
+    userId,
+    bookboxId
+  ];
+
+  const result = await Db.query(sql, binds);
+
+  return result.rows.length ? result.rows[0] : null;
+}
+
 module.exports = {
   authenticateJwt,
   createJwt,
@@ -219,7 +259,9 @@ module.exports = {
   getUser,
   deleteUser,
   addFavorite,
+  deleteFavoriteById,
   deleteFavorite,
   getFavorites,
+  getFavorite,
   setUserLastLogin
 };

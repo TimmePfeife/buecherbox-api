@@ -131,12 +131,12 @@ describe('lib/users', () => {
     }
   });
 
-  it('deleteFavorite(id)', async () => {
+  it('deleteFavoriteById(id)', async () => {
     for (let i = 0; i < Data.entries; i++) {
       const user = Data.users[i];
 
       for (let j = 0; j < user.favorites.length; j++) {
-        await Users.deleteFavorite(user.favorites[j].id);
+        await Users.deleteFavoriteById(user.favorites[j].id);
       }
 
       const favorites = await Users.getFavorites(user.id);
