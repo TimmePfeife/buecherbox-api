@@ -25,6 +25,12 @@ Router.post('/', async (req, res) => {
     res.status(HttpStatus.CREATED).json(user);
   } catch (e) {
     Logger.error(e);
+    // User already exists
+    if (parseInt(e.code) === 23505) {
+      res.sendStatus(HttpStatus.CONFLICT);
+      return;
+    }
+
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
