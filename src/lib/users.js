@@ -1,3 +1,4 @@
+const Argon = require('argon2');
 const Db = require('./db');
 const Jwt = require('jsonwebtoken');
 
@@ -50,6 +51,25 @@ function createJwt (userId) {
 }
 
 /**
+ * Creates a hashed password.
+ * @param {string} password
+ * @returns {Promise<string>}
+ */
+async function hashPassword (password) {
+  return Argon.hash(password);
+}
+
+/**
+ * Verifies a hashed password.
+ * @param {string} hash
+ * @param {string} password
+ * @returns {Promise<boolean>}
+ */
+async function verifyPassword (hash, password) {
+  return Argon.verify(hash, password);
+}
+
+/**
  * Authenticates a user by his username and password. Creates a json web token
  * if the user is registered.
  * @param {string} username
@@ -59,12 +79,10 @@ function createJwt (userId) {
 async function authenticateUser (username, password) {
   const sql = `SELECT *
                FROM Users
-               WHERE username = $1
-                 AND password = crypt($2, password)`;
+               WHERE username = $1`;
 
   const binds = [
-    username,
-    password
+    username
   ];
 
   const result = await Db.query(sql, binds);
@@ -72,6 +90,10 @@ async function authenticateUser (username, password) {
   if (!result.rows.length) return null;
 
   const user = result.rows.length ? result.rows[0] : null;
+
+  const valid = await verifyPassword(user.password, password);
+  if (!valid) return null;
+
   const token = user ? createJwt(user.id) : '';
 
   return {
@@ -90,11 +112,14 @@ async function createUser (username, password) {
   if (!username || !password) return null;
 
   const sql = `INSERT INTO Users (username, password)
-               VALUES ($1, crypt($2, gen_salt('bf'))) RETURNING *`;
+               VALUES ($1, $2) RETURNING *`;
+
+  const hash = await hashPassword(password);
+  if (!hash) return null;
 
   const binds = [
     username,
-    password
+    hash
   ];
 
   const result = await Db.query(sql, binds);

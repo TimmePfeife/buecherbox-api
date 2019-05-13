@@ -5,7 +5,7 @@ services:
   - postgresql
 before_script:
   - psql -c 'CREATE DATABASE buecherbox_test_db;' -U postgres
-  - psql buecherbox_test_db -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto;' -U postgres
+  - psql buecherbox_test_db -c 'CREATE EXTENSION IF NOT EXISTS citext;' -U postgres
 script:
   - npm install
 after_script:
