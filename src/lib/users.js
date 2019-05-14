@@ -187,7 +187,25 @@ async function addFavorite (userId, bookboxId) {
  * @param {number} id
  * @returns {Promise<void>}
  */
-async function deleteFavorite (id) {
+async function deleteFavorite (userId, bookboxId) {
+  const sql = `DELETE
+               FROM favorites
+               WHERE userid = $1 AND bookboxid = $2`;
+
+  const binds = [
+    userId,
+    bookboxId
+  ];
+
+  await Db.query(sql, binds);
+}
+
+/**
+ * Deletes an users favorite bookbox from the database.
+ * @param {number} id
+ * @returns {Promise<void>}
+ */
+async function deleteFavoriteById (id) {
   const sql = `DELETE
                FROM favorites
                WHERE id = $1`;
@@ -245,6 +263,7 @@ module.exports = {
   deleteUser,
   addFavorite,
   deleteFavorite,
+  deleteFavoriteById,
   getFavorites,
   setUserLastLogin
 };
