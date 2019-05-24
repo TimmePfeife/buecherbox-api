@@ -1,6 +1,16 @@
 const Db = require('./db');
 
 /**
+ * Selects an existing bookboxes by a given id from the database.
+ * @returns {Promise<*>}
+ */
+async function getBookBox (id) {
+  const sql = 'SELECT * FROM bookboxes WHERE id = $1';
+  const result = await Db.query(sql, [id]);
+  return result.rows.length ? result.rows[0] : null;
+}
+
+/**
  * Selects all existing bookboxes from the database.
  * @returns {Promise<*>}
  */
@@ -30,6 +40,27 @@ async function createBookBox (bookBox, image) {
     bookBox.lat,
     bookBox.lng,
     bookBox.hint
+  ];
+
+  const result = await Db.query(sql, binds);
+  return result.rows.length ? result.rows[0] : null;
+}
+
+async function updateBookBox (bookBox) {
+  if (!bookBox) return null;
+
+  const sql = `UPDATE BookBoxes
+               SET description = :description,
+                   imgid       = :img,
+                   hint        = :hint,
+                   updated     = current_timestamp
+               WHERE id = :bookboxid RETURNING *`;
+
+  const binds = [
+    bookBox.description,
+    bookBox.imgid,
+    bookBox.hint,
+    bookBox.id
   ];
 
   const result = await Db.query(sql, binds);
@@ -67,6 +98,7 @@ async function getFavoritesbyUser (userId) {
 
 module.exports = {
   createBookBox,
+  getBookBox,
   getBookBoxes,
   getBookBoxesByUser,
   getFavoritesbyUser

@@ -42,4 +42,39 @@ Router.get('/user/:id', Auth, async (req, res) => {
   }
 });
 
+Router.put('/:id', Auth, Upload.single('file'), async (req, res) => {
+  try {
+    const bookboxId = req.params.id;
+
+    // ToDo Check if Bookbox is created by user
+    const bookbox = await BookBox.getBookBox(bookboxId);
+
+    if (bookbox.userid !== req.token.id) {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+
+    if (!bookbox) {
+      res.sendStatus(HttpStatus.NOT_FOUND);
+      return;
+    }
+
+    const image = await Images.save(req.file);
+
+    console.log(bookbox);
+    console.log(req.body);
+
+    bookbox.description = req.body.description || bookbox.description;
+    bookbox.hint = req.body.hint || bookbox.hint;
+    bookbox.imgid = image ? image.id : bookbox.imgid;
+
+    console.log(bookbox);
+
+    res.status(HttpStatus.OK).json(bookbox);
+  } catch (e) {
+    Logger.error(e);
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+});
+
 module.exports = Router;
