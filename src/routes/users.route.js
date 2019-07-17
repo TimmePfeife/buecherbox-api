@@ -8,23 +8,15 @@ const Validation = require('../middleware/validation');
 
 const Router = Express.Router();
 
-Router.post('/', async (req, res) => {
+Router.post('/', Validation('users'), async (req, res) => {
   try {
-    const auth = req.get('authorization');
-
-    if (!auth) {
-      res.sendStatus(HttpStatus.UNAUTHORIZED);
-    }
-
-    const credentials = Users.getCredentials(auth);
-
-    const user = await Users.createUser(credentials[0], credentials[1]);
+    const user = await Users.createUser(req.body.username, req.body.password);
     user.token = Users.createJwt(user.id);
     delete user.password;
 
     res.status(HttpStatus.CREATED).json(user);
   } catch (e) {
-    Logger.error(e);
+    Logger.error('Could not create user', e);
     if (parseInt(e.code) === 23505) {
       res.sendStatus(HttpStatus.CONFLICT);
       return;
@@ -170,6 +162,30 @@ Router.delete('/:id/favorites/:bookbox', Auth, Validation('favorites'), async (r
       return;
     }
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+});
+
+Router.post('/:id/password', Auth, Validation('password'), async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+
+    if (userId !== req.token.id) {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+
+    const auth = await Users.authenticateUserById(userId, req.body.oldPassword);
+    if (!auth) {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+
+    await Users.changePassword(userId, req.body.newPassword);
+
+    res.sendStatus(HttpStatus.OK);
+  } catch (e) {
+    Logger.error(e);
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
 
