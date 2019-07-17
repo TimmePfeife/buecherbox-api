@@ -90,6 +90,7 @@ async function authenticateUser (username, password) {
   if (!result.rows.length) return null;
 
   const user = result.rows.length ? result.rows[0] : null;
+  if (!user) return null;
 
   const valid = await verifyPassword(user.password, password);
   if (!valid) return null;
@@ -123,6 +124,9 @@ async function authenticateUserById (userId, password) {
   if (!result.rows.length) return null;
 
   const user = result.rows.length ? result.rows[0] : null;
+  if (!user) return null;
+
+  console.log(password);
 
   const valid = await verifyPassword(user.password, password);
   if (!valid) return null;
@@ -217,7 +221,8 @@ async function addFavorite (userId, bookboxId) {
 
 /**
  * Deletes an users favorite bookbox from the database.
- * @param {number} id
+ * @param userId
+ * @param bookboxId
  * @returns {Promise<void>}
  */
 async function deleteFavorite (userId, bookboxId) {
