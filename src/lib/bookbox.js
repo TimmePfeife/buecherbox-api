@@ -50,11 +50,11 @@ async function updateBookBox (bookBox) {
   if (!bookBox) return null;
 
   const sql = `UPDATE BookBoxes
-               SET description = :description,
-                   imgid       = :img,
-                   hint        = :hint,
+               SET description = $1,
+                   imgid       = $2,
+                   hint        = $3,
                    updated     = current_timestamp
-               WHERE id = :bookboxid RETURNING *`;
+               WHERE id = $4 RETURNING *`;
 
   const binds = [
     bookBox.description,
@@ -101,5 +101,6 @@ module.exports = {
   getBookBox,
   getBookBoxes,
   getBookBoxesByUser,
-  getFavoritesbyUser
+  getFavoritesbyUser,
+  updateBookBox
 };

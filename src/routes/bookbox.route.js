@@ -61,16 +61,13 @@ Router.put('/:id', Auth, Upload.single('file'), async (req, res) => {
 
     const image = await Images.save(req.file);
 
-    console.log(bookbox);
-    console.log(req.body);
-
     bookbox.description = req.body.description || bookbox.description;
     bookbox.hint = req.body.hint || bookbox.hint;
     bookbox.imgid = image ? image.id : bookbox.imgid;
 
-    console.log(bookbox);
+    const result = await BookBox.updateBookBox(bookbox);
 
-    res.status(HttpStatus.OK).json(bookbox);
+    res.status(HttpStatus.OK).json(result);
   } catch (e) {
     Logger.error(e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
