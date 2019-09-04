@@ -15,7 +15,7 @@ async function getBookBox (id) {
  * @returns {Promise<*>}
  */
 async function getBookBoxes () {
-  const sql = 'SELECT * FROM bookboxes';
+  const sql = 'SELECT * FROM bookboxes ORDER BY id';
   const result = await Db.query(sql);
   return result.rows;
 }
