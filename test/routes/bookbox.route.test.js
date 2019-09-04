@@ -38,7 +38,7 @@ describe('routes/user.route', () => {
     const strippedResult = result.map(el => ({
       description: el.description,
       hint: el.hint,
-      imgsrc: el.imgsrc,
+      imgid: el.imgid,
       lat: parseFloat(el.lat),
       lng: parseFloat(el.lng),
       location: el.location,

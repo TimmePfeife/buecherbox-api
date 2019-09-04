@@ -90,6 +90,43 @@ async function authenticateUser (username, password) {
   if (!result.rows.length) return null;
 
   const user = result.rows.length ? result.rows[0] : null;
+  if (!user) return null;
+
+  const valid = await verifyPassword(user.password, password);
+  if (!valid) return null;
+
+  const token = user ? createJwt(user.id) : '';
+
+  return {
+    user,
+    token
+  };
+}
+
+/**
+ * Authenticates a user by his user id and password. Creates a json web token
+ * if the user is registered.
+ * @param {number} userId
+ * @param {string} password
+ * @returns {Promise<{user: null, token: (string|*|string)}>}
+ */
+async function authenticateUserById (userId, password) {
+  let sql = `SELECT *
+             FROM Users
+             WHERE id = $1`;
+
+  let binds = [
+    userId
+  ];
+
+  const result = await Db.query(sql, binds);
+
+  if (!result.rows.length) return null;
+
+  const user = result.rows.length ? result.rows[0] : null;
+  if (!user) return null;
+
+  console.log(password);
 
   const valid = await verifyPassword(user.password, password);
   if (!valid) return null;
@@ -184,6 +221,26 @@ async function addFavorite (userId, bookboxId) {
 
 /**
  * Deletes an users favorite bookbox from the database.
+ * @param userId
+ * @param bookboxId
+ * @returns {Promise<void>}
+ */
+async function deleteFavorite (userId, bookboxId) {
+  const sql = `DELETE
+               FROM favorites
+               WHERE userid = $1
+                 AND bookboxid = $2`;
+
+  const binds = [
+    userId,
+    bookboxId
+  ];
+
+  await Db.query(sql, binds);
+}
+
+/**
+ * Deletes an users favorite bookbox from the database.
  * @param {number} id
  * @returns {Promise<void>}
  */
@@ -194,25 +251,6 @@ async function deleteFavoriteById (id) {
 
   const binds = [
     id
-  ];
-
-  await Db.query(sql, binds);
-}
-
-/**
- * Deletes an users favorite bookbox from the database.
- * @param {number} userId
- * @param {number} bookboxId
- * @returns {Promise<void>}
- */
-async function deleteFavorite (userId, bookboxId) {
-  const sql = `DELETE
-               FROM favorites
-               WHERE userid = $1 AND bookboxid = $2`;
-
-  const binds = [
-    userId,
-    bookboxId
   ];
 
   await Db.query(sql, binds);
@@ -275,10 +313,36 @@ async function getFavorite (userId, bookboxId) {
   return result.rows.length ? result.rows[0] : null;
 }
 
+/**
+ * Changes the password of user by his user id in the database.
+ * @param userId
+ * @param newPassword
+ * @returns {Promise<void>}
+ */
+async function changePassword (userId, newPassword) {
+  if (!userId || !newPassword) return null;
+
+  const sql = `UPDATE Users
+         SET password = $1,
+             updated  = current_timestamp
+         WHERE id = $2`;
+
+  const hash = await hashPassword(newPassword);
+  if (!hash) return null;
+
+  const binds = [
+    hash,
+    userId
+  ];
+
+  await Db.query(sql, binds);
+}
+
 module.exports = {
   authenticateJwt,
   createJwt,
   authenticateUser,
+  authenticateUserById,
   createUser,
   getCredentials,
   getUser,
@@ -288,5 +352,6 @@ module.exports = {
   deleteFavorite,
   getFavorites,
   getFavorite,
-  setUserLastLogin
+  setUserLastLogin,
+  changePassword
 };

@@ -1,7 +1,7 @@
 CREATE TABLE BookBoxes
 (
     id          SERIAL PRIMARY KEY,
-    userid      INTEGER REFERENCES Users (id),
+    userid      INTEGER REFERENCES Users (id) ON DELETE SET NULL,
     imgid       INTEGER REFERENCES images (id),
     description VARCHAR(255),
     location    VARCHAR(255),
