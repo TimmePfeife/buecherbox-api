@@ -23,6 +23,7 @@ CREATE OR REPLACE VIEW dashboard_users_view
 AS
 SELECT u.id,
        u.username,
+       r.name rolename,
        (
            SELECT COUNT(*)
            FROM favorites f
@@ -32,4 +33,6 @@ SELECT u.id,
        u.created,
        u.updated,
        u.last_login
-FROM users u;
+FROM users u,
+     roles r
+WHERE u.roleid = r.id;

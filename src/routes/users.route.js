@@ -11,6 +11,7 @@ const Router = Express.Router();
 Router.post('/', Validation('users'), async (req, res) => {
   try {
     const user = await Users.createUser(req.body.username, req.body.password);
+    // ToDo get role name
     user.token = Users.createJwt(user.id);
     delete user.password;
 

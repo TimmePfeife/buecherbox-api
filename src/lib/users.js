@@ -39,16 +39,17 @@ function authenticateJwt (jwt) {
  * @param {number} userId
  * @returns {string|*}
  */
-function createJwt (userId) {
+function createJwt (userId, role) {
   if (!userId) return '';
 
   // ToDo add iss user/admin
   const payload = {
     timestamp: Math.round((new Date()).getTime() / 1000),
-    id: userId
+    id: userId,
+    role
   };
 
-  return Jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 24 * 60 * 60 });
+  return Jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: 24 * 60 * 60});
 }
 
 /**
@@ -66,7 +67,7 @@ async function hashPassword (password) {
  * @param {string} password
  * @returns {Promise<boolean>}
  */
-async function verifyPassword (hash, password) {
+async function verifyPassword(hash, password) {
   return Argon.verify(hash, password);
 }
 
@@ -78,9 +79,12 @@ async function verifyPassword (hash, password) {
  * @returns {Promise<null|{user: null, token: (string|*|string)}>}
  */
 async function authenticateUser (username, password) {
-  const sql = `SELECT *
-               FROM Users
-               WHERE username = $1`;
+  const sql = `SELECT Users.*,
+                      Roles.name rolename
+               FROM Users,
+                    Roles
+               WHERE username = $1
+                 AND Users.roleid = Roles.id`;
 
   const binds = [
     username
@@ -96,7 +100,7 @@ async function authenticateUser (username, password) {
   const valid = await verifyPassword(user.password, password);
   if (!valid) return null;
 
-  const token = user ? createJwt(user.id) : '';
+  const token = user ? createJwt(user.id, user.rolename) : '';
 
   return {
     user,
@@ -112,9 +116,12 @@ async function authenticateUser (username, password) {
  * @returns {Promise<{user: null, token: (string|*|string)}>}
  */
 async function authenticateUserById (userId, password) {
-  let sql = `SELECT *
-             FROM Users
-             WHERE id = $1`;
+  let sql = `SELECT Users.*,
+                    Roles.name rolename
+             FROM Users,
+                  Roles
+             WHERE Users.id = $1
+               AND Users.roleid = Roles.id`;
 
   let binds = [
     userId
@@ -130,7 +137,7 @@ async function authenticateUserById (userId, password) {
   const valid = await verifyPassword(user.password, password);
   if (!valid) return null;
 
-  const token = user ? createJwt(user.id) : '';
+  const token = user ? createJwt(user.id, user.rolename) : '';
 
   return {
     user,
@@ -224,7 +231,7 @@ async function addFavorite (userId, bookboxId) {
  * @param bookboxId
  * @returns {Promise<void>}
  */
-async function deleteFavorite (userId, bookboxId) {
+async function deleteFavorite(userId, bookboxId) {
   const sql = `DELETE
                FROM favorites
                WHERE userid = $1
@@ -300,7 +307,8 @@ async function setUserLastLogin (userId) {
 async function getFavorite (userId, bookboxId) {
   const sql = `SELECT *
                from favorites
-               where userid = $1 AND bookboxid = $2`;
+               where userid = $1
+                 AND bookboxid = $2`;
 
   const binds = [
     userId,
@@ -322,9 +330,9 @@ async function changePassword (userId, newPassword) {
   if (!userId || !newPassword) return null;
 
   const sql = `UPDATE Users
-         SET password = $1,
-             updated  = current_timestamp
-         WHERE id = $2`;
+               SET password = $1,
+                   updated  = current_timestamp
+               WHERE id = $2`;
 
   const hash = await hashPassword(newPassword);
   if (!hash) return null;
