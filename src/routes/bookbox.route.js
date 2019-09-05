@@ -46,7 +46,6 @@ Router.put('/:id', Auth, Upload.single('file'), async (req, res) => {
   try {
     const bookboxId = req.params.id;
 
-    // ToDo Check if Bookbox is created by user
     const bookbox = await BookBox.getBookBox(bookboxId);
 
     if (bookbox.userid !== req.token.id) {
