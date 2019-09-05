@@ -42,6 +42,7 @@ function authenticateJwt (jwt) {
 function createJwt (userId) {
   if (!userId) return '';
 
+  // ToDo add iss user/admin
   const payload = {
     timestamp: Math.round((new Date()).getTime() / 1000),
     id: userId
@@ -125,8 +126,6 @@ async function authenticateUserById (userId, password) {
 
   const user = result.rows.length ? result.rows[0] : null;
   if (!user) return null;
-
-  console.log(password);
 
   const valid = await verifyPassword(user.password, password);
   if (!valid) return null;
