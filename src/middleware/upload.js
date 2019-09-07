@@ -1,3 +1,4 @@
+const { checkFileType } = require('../lib/images');
 const Multer = require('multer');
 const Path = require('path');
 
@@ -8,14 +9,9 @@ const Path = require('path');
  * @param cb
  */
 const fileFilter = (req, file, cb) => {
-  const allowedFiles = ['.jpg', '.png'];
-
-  const ext = Path.extname(file.originalname).toLowerCase();
-
-  file.ext = ext;
-
   // TODO: Logging
-  if (allowedFiles.includes(ext)) {
+  if (checkFileType(file)) {
+    file.ext = Path.extname(file.originalname).toLowerCase();
     cb(null, true);
   } else {
     cb(null, false);

@@ -21,6 +21,11 @@ Router.get('/', async (req, res) => {
 
 Router.post('/', Auth, Upload.single('file'), Validation('bookbox'), async (req, res) => {
   try {
+    if (!Images.checkFileType(req.file)) {
+      res.sendStatus(HttpStatus.BAD_REQUEST);
+      return;
+    }
+
     const image = await Images.save(req.file);
     const result = await BookBox.createBookBox(req.body, image);
     res.status(HttpStatus.CREATED).json(result);

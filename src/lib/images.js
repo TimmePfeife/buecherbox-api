@@ -1,8 +1,22 @@
 const Crypto = require('crypto');
 const Db = require('../lib/db');
+const FileType = require('file-type');
 const Fs = require('fs');
 const Jimp = require('jimp');
 const Path = require('path');
+
+function checkFileType (file) {
+  if (!file) return false;
+
+  let mimetype = file.mimetype;
+
+  if (file.buffer) {
+    const type = FileType(file.buffer);
+    mimetype = type.mime;
+  }
+  const allowedFiles = ['image/jpeg', 'image/png'];
+  return allowedFiles.includes(mimetype);
+}
 
 /**
  * Generates a random filename for a given image.
@@ -107,6 +121,7 @@ async function getImage (imageId) {
 }
 
 module.exports = {
+  checkFileType,
   save,
   getImage
 };
