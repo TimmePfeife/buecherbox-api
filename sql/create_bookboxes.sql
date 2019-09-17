@@ -15,3 +15,5 @@ CREATE TABLE BookBoxes
             lng >= -180 AND lng <= 180
         )
 );
+
+CREATE INDEX bookboxes_userid_index ON BookBoxes(userid);
