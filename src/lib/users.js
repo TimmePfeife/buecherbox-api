@@ -1,4 +1,5 @@
 const Argon = require('argon2');
+const Crypto = require('crypto');
 const Db = require('./db');
 const Jwt = require('jsonwebtoken');
 
@@ -53,6 +54,53 @@ function createJwt (userId, role) {
 }
 
 /**
+ * Creates a new refresh token and inserts it into the database.
+ * @param {number} userId
+ * @param {string} tokenLifetime
+ * @returns {Promise<string>}
+ */
+async function createRefreshToken (userId, tokenLifetime) {
+  const refreshToken = Crypto.randomBytes(16).toString('hex');
+
+  const sql = `INSERT INTO Tokens (id, userid, expires)
+               VALUES ($1, $2, current_timestamp + $3::interval)`;
+
+  const binds = [
+    refreshToken,
+    userId,
+    tokenLifetime
+  ];
+
+  await Db.query(sql, binds);
+
+  return refreshToken;
+}
+
+/**
+ * Checks if a given refresh token is valid.
+ * @param {string} refreshToken
+ * @param {number} userId
+ * @returns {Promise<null>}
+ */
+async function checkRefreshToken (refreshToken, userId) {
+  const sql = `SELECT *
+               FROM Tokens
+               WHERE id = $1
+                 AND userid = $2
+                 AND current_timestamp < expires
+                 AND revoked = false;`;
+
+  const binds = [
+    refreshToken,
+    userId
+  ];
+
+  const result = await Db.query(sql, binds);
+
+  return result.rows.length ? result.rows[0] : null;
+}
+
+/**
  * Creates a hashed password.
  * @param {string} password
  * @returns {Promise<string>}
@@ -67,7 +115,7 @@ async function hashPassword (password) {
  * @param {string} password
  * @returns {Promise<boolean>}
  */
-async function verifyPassword(hash, password) {
+async function verifyPassword (hash, password) {
   return Argon.verify(hash, password);
 }
 
@@ -146,7 +194,7 @@ async function authenticateUserById (userId, password) {
 }
 
 /**
- * Inserts a new user into the database and returns  the result.
+ * Inserts a new user into the database and returns the result.
  * @param {string} username
  * @param {string} password
  * @returns {Promise<null>}
