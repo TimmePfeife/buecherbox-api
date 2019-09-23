@@ -17,14 +17,13 @@ Router.post('/', Validation('users'), async (req, res) => {
 
     res.status(HttpStatus.CREATED).json(user);
   } catch (e) {
-    Logger.error(e);
+    Logger.error('Could not create user', e);
     // User already exists
     if (parseInt(e.code) === 23505) {
       res.sendStatus(HttpStatus.CONFLICT);
       return;
     }
 
-    Logger.error('Could not create user', e);
     if (parseInt(e.code) === 23505) {
       res.sendStatus(HttpStatus.CONFLICT);
       return;
@@ -52,10 +51,35 @@ Router.post('/auth', async (req, res) => {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
   } catch (e) {
-    Logger.error(e);
+    Logger.error('Could not authenticate user', e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
+
+Router.post('/refresh', async (req, res) => {
+  try {
+    const refreshToken = req.body.token;
+    const userId = req.body.userId;
+
+    if (!Users.checkRefreshToken(userId, refreshToken)) {
+      return res.sendStatus(HttpStatus.UNAUTHORIZED);
+    }
+
+    const user = await Users.getUser(userId);
+
+    const result = {
+      // ToDo Role as string
+      token: await Users.createJwt(userId, user.roleid)
+    };
+
+    res.json(result);
+  } catch (e) {
+    Logger.error('Could not refresh token', e);
+    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+});
+
+// ToDo Router.post('/revoke')
 
 Router.get('/:id', Auth, async (req, res) => {
   try {
@@ -71,7 +95,7 @@ Router.get('/:id', Auth, async (req, res) => {
 
     res.json(user);
   } catch (e) {
-    Logger.error(e);
+    Logger.error('Could not get user', e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
@@ -89,7 +113,7 @@ Router.delete('/:id', Auth, async (req, res) => {
 
     res.sendStatus(HttpStatus.OK);
   } catch (e) {
-    Logger.error(e);
+    Logger.error('Could not delete user', e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
@@ -100,7 +124,7 @@ Router.get('/:id/bookboxes', Auth, async (req, res) => {
     const result = await BookBox.getBookBoxesByUser(userId);
     res.json(result);
   } catch (e) {
-    Logger.error(e);
+    Logger.error('Could not get created bookboxes from a user', e);
     if (e.name === 'TokenExpiredError') {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
       return;
@@ -121,7 +145,7 @@ Router.get('/:id/favorites', Auth, async (req, res) => {
     const result = await BookBox.getFavoritesbyUser(userId);
     res.json(result);
   } catch (e) {
-    Logger.error(e);
+    Logger.error('Could not get favorites from a user', e);
     if (e.name === 'TokenExpiredError') {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
       return;
@@ -149,7 +173,8 @@ Router.post('/:id/favorites', Auth, Validation('favorites'), async (req, res) =>
     favorite = await Users.addFavorite(userId, bookboxId);
     res.status(HttpStatus.CREATED).json(favorite);
   } catch (e) {
-    Logger.error(e);
+    Logger.error('Could not add a user favorite', e);
+
     if (e.name === 'TokenExpiredError') {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
       return;
@@ -158,6 +183,7 @@ Router.post('/:id/favorites', Auth, Validation('favorites'), async (req, res) =>
   }
 });
 
+// ToDo remove on of the next functions
 Router.delete('/:id/favorites', Auth, Validation('favorites'), async (req, res) => {
   try {
     const userId = parseInt(req.params.id);
@@ -171,7 +197,7 @@ Router.delete('/:id/favorites', Auth, Validation('favorites'), async (req, res) 
     await Users.deleteFavorite(userId, bookboxId);
     res.sendStatus(HttpStatus.OK);
   } catch (e) {
-    Logger.error(e);
+    Logger.error('Could not delete a user favorite', e);
     if (e.name === 'TokenExpiredError') {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
       return;
@@ -193,7 +219,7 @@ Router.delete('/:id/favorites/:bookbox', Auth, Validation('favorites'), async (r
     await Users.deleteFavorite(userId, bookboxId);
     res.sendStatus(HttpStatus.OK);
   } catch (e) {
-    Logger.error(e);
+    Logger.error('Could not delete a user favorite', e);
     if (e.name === 'TokenExpiredError') {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
       return;
@@ -221,7 +247,7 @@ Router.post('/:id/password', Auth, Validation('password'), async (req, res) => {
 
     res.sendStatus(HttpStatus.OK);
   } catch (e) {
-    Logger.error(e);
+    Logger.error('Could not change user password', e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });

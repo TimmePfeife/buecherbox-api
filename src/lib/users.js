@@ -40,6 +40,7 @@ function authenticateJwt (jwt) {
  * @param {number} userId
  * @returns {string|*}
  */
+// ToDo refactor to use 'data' argument
 function createJwt (userId, role) {
   if (!userId) return '';
 
@@ -78,11 +79,11 @@ async function createRefreshToken (userId, tokenLifetime) {
 
 /**
  * Checks if a given refresh token is valid.
- * @param {string} refreshToken
  * @param {number} userId
+ * @param {string} refreshToken
  * @returns {Promise<null>}
  */
-async function checkRefreshToken (refreshToken, userId) {
+async function checkRefreshToken (userId, refreshToken) {
   const sql = `SELECT *
                FROM Tokens
                WHERE id = $1
@@ -148,6 +149,7 @@ async function authenticateUser (username, password) {
   const valid = await verifyPassword(user.password, password);
   if (!valid) return null;
 
+  // ToDo put in router so function fullfills SRP
   const token = user ? createJwt(user.id, user.rolename) : '';
 
   return {
@@ -279,7 +281,7 @@ async function addFavorite (userId, bookboxId) {
  * @param bookboxId
  * @returns {Promise<void>}
  */
-async function deleteFavorite(userId, bookboxId) {
+async function deleteFavorite (userId, bookboxId) {
   const sql = `DELETE
                FROM favorites
                WHERE userid = $1
@@ -394,19 +396,21 @@ async function changePassword (userId, newPassword) {
 }
 
 module.exports = {
+  addFavorite,
   authenticateJwt,
-  createJwt,
   authenticateUser,
   authenticateUserById,
+  changePassword,
+  checkRefreshToken,
+  createJwt,
+  createRefreshToken,
   createUser,
-  getCredentials,
-  getUser,
-  deleteUser,
-  addFavorite,
-  deleteFavoriteById,
   deleteFavorite,
-  getFavorites,
+  deleteFavoriteById,
+  deleteUser,
+  getCredentials,
   getFavorite,
-  setUserLastLogin,
-  changePassword
+  getFavorites,
+  getUser,
+  setUserLastLogin
 };
