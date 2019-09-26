@@ -2,13 +2,14 @@ const Auth = require('../middleware/auth');
 const BookBox = require('../lib/bookbox');
 const Express = require('express');
 const HttpStatus = require('http-status-codes');
+const Limiter = require('../middleware/limiter');
 const Logger = require('../lib/logger');
 const Users = require('../lib/users');
 const Validation = require('../middleware/validation');
 
 const Router = Express.Router();
 
-Router.post('/', Validation('users'), async (req, res) => {
+Router.post('/', Limiter, Validation('users'), async (req, res) => {
   try {
     const user = await Users.createUser(req.body.username, req.body.password);
     if (!user) {
@@ -45,7 +46,7 @@ Router.post('/', Validation('users'), async (req, res) => {
   }
 });
 
-Router.post('/auth', async (req, res) => {
+Router.post('/auth', Limiter, async (req, res) => {
   try {
     const auth = req.get('authorization');
     if (!auth) {
@@ -95,7 +96,7 @@ Router.post('/auth', async (req, res) => {
   }
 });
 
-Router.post('/:id/refresh', async (req, res) => {
+Router.post('/:id/refresh', Limiter, async (req, res) => {
   try {
     const auth = req.get('authorization');
     if (!auth) {
