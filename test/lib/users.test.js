@@ -50,7 +50,7 @@ describe('lib/users', () => {
   it('authenticateJwt(jwt)', () => {
     for (let i = 0; i < Data.entries; i++) {
       const userId = Faker.random.number();
-      const token = Users.createJwt(userId);
+      const token = Users.createJwt({ id: userId });
 
       const auth = Users.authenticateJwt('Bearer ' + token);
 
@@ -90,14 +90,14 @@ describe('lib/users', () => {
     }
   });
 
-  it('getUser(userId)', async () => {
+  it('getUserById(userId)', async () => {
     for (let i = 0; i < Data.entries; i++) {
       const user = Data.users[i];
 
-      const noUser = await Users.getUser(Faker.random.number() + Data.entries);
+      const noUser = await Users.getUserById(Faker.random.number() + Data.entries);
       expect(noUser).to.be.null;
 
-      const dbUser = await Users.getUser(user.id);
+      const dbUser = await Users.getUserById(user.id);
 
       expect(dbUser).to.be.an('object');
       expect(dbUser.id).to.equal(user.id);

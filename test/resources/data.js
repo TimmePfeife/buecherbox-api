@@ -113,7 +113,7 @@ async function initFavorites () {
 module.exports = {
   drop,
   dropUsers,
-  getUser,
+  getUserById: getUser,
   init,
   initBookboxes,
   initUsers,

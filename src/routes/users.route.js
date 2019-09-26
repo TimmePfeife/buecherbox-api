@@ -11,8 +11,21 @@ const Router = Express.Router();
 Router.post('/', Validation('users'), async (req, res) => {
   try {
     const user = await Users.createUser(req.body.username, req.body.password);
-    // ToDo get role name
-    user.token = Users.createJwt(user.id);
+    if (!user) {
+      res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    const role = await Users.getRoleById(user.roleid);
+    if (!role) {
+      res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    user.token = Users.createJwt({
+      id: user.id,
+      role: role.name
+    });
     delete user.password;
 
     res.status(HttpStatus.CREATED).json(user);
@@ -34,42 +47,86 @@ Router.post('/', Validation('users'), async (req, res) => {
 
 Router.post('/auth', async (req, res) => {
   try {
-    const token = req.get('authorization');
-
-    if (!token) {
-      res.sendStatus(HttpStatus.UNAUTHORIZED);
+    const auth = req.get('authorization');
+    if (!auth) {
+      res.sendStatus(HttpStatus.BAD_REQUEST);
     }
 
-    const credentials = Users.getCredentials(token);
-    const result = await Users.authenticateUser(credentials[0], credentials[1]);
+    const credentials = Users.getCredentials(auth);
+    const username = credentials[0];
+    const password = credentials[1];
 
-    if (result && result.user && !result.user.deleted) {
-      await Users.setUserLastLogin(result.user.id);
-      delete result.user.password;
-      res.json(result);
-    } else {
+    const user = await Users.getUserByUsername(username);
+    if (!user && user.deleted) {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
     }
+
+    const valid = await Users.verifyPassword(user.password, password);
+    if (!valid) {
+      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return;
+    }
+
+    const role = await Users.getRoleById(user.roleid);
+    if (!role) {
+      res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    const token = Users.createJwt({
+      id: user.id,
+      role: role.name
+    });
+    const refreshToken = await Users.createRefreshToken(user.id, '1 day');
+
+    await Users.setUserLastLogin(user.id);
+
+    delete user.password;
+
+    res.json({
+      user,
+      token,
+      refreshToken
+    });
   } catch (e) {
     Logger.error('Could not authenticate user', e);
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
 
-Router.post('/refresh', async (req, res) => {
+Router.post('/:id/refresh', async (req, res) => {
   try {
-    const refreshToken = req.body.token;
-    const userId = req.body.userId;
+    const auth = req.get('authorization');
+    if (!auth) {
+      res.sendStatus(HttpStatus.BAD_REQUEST);
+      return;
+    }
 
-    if (!Users.checkRefreshToken(userId, refreshToken)) {
+    const refreshToken = Users.getRefreshToken(auth);
+    const userId = req.params.id;
+
+    if (!await Users.checkRefreshToken(userId, refreshToken)) {
       return res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
 
-    const user = await Users.getUser(userId);
+    const user = await Users.getUserById(userId);
+    if (!user) {
+      res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+      return;
+    }
+
+    const role = await Users.getRoleById(user.roleid);
+    if (!role) {
+      res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+      return;
+    }
 
     const result = {
-      // ToDo Role as string
-      token: await Users.createJwt(userId, user.roleid)
+      token: await Users.createJwt({
+        id: user.id,
+        role: role.name
+      })
     };
 
     res.json(result);
@@ -84,7 +141,7 @@ Router.post('/refresh', async (req, res) => {
 Router.get('/:id', Auth, async (req, res) => {
   try {
     const userId = req.params.id;
-    const user = await Users.getUser(userId);
+    const user = await Users.getUserById(userId);
 
     if (!user || user.deleted) {
       res.sendStatus(HttpStatus.NOT_FOUND);
@@ -175,29 +232,6 @@ Router.post('/:id/favorites', Auth, Validation('favorites'), async (req, res) =>
   } catch (e) {
     Logger.error('Could not add a user favorite', e);
 
-    if (e.name === 'TokenExpiredError') {
-      res.sendStatus(HttpStatus.UNAUTHORIZED);
-      return;
-    }
-    res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  }
-});
-
-// ToDo remove on of the next functions
-Router.delete('/:id/favorites', Auth, Validation('favorites'), async (req, res) => {
-  try {
-    const userId = parseInt(req.params.id);
-
-    if (userId !== req.token.id) {
-      res.sendStatus(HttpStatus.UNAUTHORIZED);
-      return;
-    }
-    const bookboxId = req.body.bookboxId;
-
-    await Users.deleteFavorite(userId, bookboxId);
-    res.sendStatus(HttpStatus.OK);
-  } catch (e) {
-    Logger.error('Could not delete a user favorite', e);
     if (e.name === 'TokenExpiredError') {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
       return;

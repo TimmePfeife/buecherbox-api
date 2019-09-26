@@ -17,7 +17,7 @@ describe('middleware/auth', () => {
       for (let i = 0; i < Data.entries; i++) {
         const user = Data.users[i];
 
-        const jwt = Users.createJwt(user.id);
+        const jwt = Users.createJwt({ id: user.id });
         const token = `Bearer ${jwt}`;
         const authToken = Users.authenticateJwt(token);
 
@@ -42,7 +42,7 @@ describe('middleware/auth', () => {
       for (let i = 0; i < Data.entries; i++) {
         const user = Data.users[i];
 
-        const jwt = Users.createJwt(user.id);
+        const jwt = Users.createJwt({ id: user.id });
         const token = `Beare ${jwt}`;
 
         const res = HttpMocks.createResponse();

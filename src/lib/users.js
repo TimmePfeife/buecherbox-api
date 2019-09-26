@@ -37,21 +37,33 @@ function authenticateJwt (jwt) {
 
 /**
  * Creates a new json web token.
- * @param {number} userId
+ * @param {object} data
  * @returns {string|*}
  */
-// ToDo refactor to use 'data' argument
-function createJwt (userId, role) {
-  if (!userId) return '';
+function createJwt (data) {
+  if (!data) return '';
 
-  // ToDo add iss user/admin
   const payload = {
     timestamp: Math.round((new Date()).getTime() / 1000),
-    id: userId,
-    role
+    ...data
   };
 
   return Jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: 24 * 60 * 60});
+}
+
+/**
+ * Extracts a refresh token from a given bearer authentication header.
+ * @param {string} refreshToken
+ * @returns {null|*|string}
+ */
+function getRefreshToken (refreshToken) {
+  if (!refreshToken) return null;
+
+  const header = refreshToken.split(' ');
+
+  if (header[0].toLowerCase() !== 'bearer') return null;
+
+  return header[1];
 }
 
 /**
@@ -149,8 +161,7 @@ async function authenticateUser (username, password) {
   const valid = await verifyPassword(user.password, password);
   if (!valid) return null;
 
-  // ToDo put in router so function fullfills SRP
-  const token = user ? createJwt(user.id, user.rolename) : '';
+  const token = user ? createJwt({ id: user.id, role: user.name }) : '';
 
   return {
     user,
@@ -224,13 +235,32 @@ async function createUser (username, password) {
  * @param {number} userId
  * @returns {Promise<null>}
  */
-async function getUser (userId) {
+async function getUserById (userId) {
   const sql = `SELECT *
                from Users
                where id = $1`;
 
   const binds = [
     userId
+  ];
+
+  const result = await Db.query(sql, binds);
+
+  return result.rows.length ? result.rows[0] : null;
+}
+
+/**
+ * Selects an user by the username.
+ * @param {string} username
+ * @returns {Promise<null>}
+ */
+async function getUserByUsername (username) {
+  const sql = `SELECT *
+               from Users
+               where username = $1`;
+
+  const binds = [
+    username
   ];
 
   const result = await Db.query(sql, binds);
@@ -395,6 +425,27 @@ async function changePassword (userId, newPassword) {
   await Db.query(sql, binds);
 }
 
+/**
+ * Selects a role by its id.
+ * @param {number} roleId
+ * @returns {Promise<null>}
+ */
+async function getRoleById (roleId) {
+  if (!roleId) return null;
+
+  const sql = `SELECT *
+               FROM Roles
+               WHERE id = $1`;
+
+  const binds = [
+    roleId
+  ];
+
+  const result = await Db.query(sql, binds);
+
+  return result.rows.length ? result.rows[0] : null;
+}
+
 module.exports = {
   addFavorite,
   authenticateJwt,
@@ -411,6 +462,10 @@ module.exports = {
   getCredentials,
   getFavorite,
   getFavorites,
-  getUser,
-  setUserLastLogin
+  getRefreshToken,
+  getRoleById,
+  getUserById,
+  getUserByUsername,
+  setUserLastLogin,
+  verifyPassword
 };
