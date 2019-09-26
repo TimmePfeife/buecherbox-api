@@ -1,5 +1,5 @@
 const BodyParser = require('body-parser');
-const Config = require('config');
+const Config = require('./config');
 const Cors = require('cors');
 const Express = require('express');
 const Helmet = require('helmet');
