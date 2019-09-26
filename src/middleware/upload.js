@@ -1,3 +1,4 @@
+const Config = require('../../config');
 const { checkFileType } = require('../lib/images');
 const Multer = require('multer');
 const Path = require('path');
@@ -19,9 +20,9 @@ const fileFilter = (req, file, cb) => {
 };
 
 const options = {
-  dest: process.env.UPLOAD_DIR,
+  dest: Config.upload.dir,
   limits: {
-    fileSize: process.env.UPLOAD_SIZE * 1024 * 1024
+    fileSize: Config.upload.size * 1024 * 1024
   },
   fileFilter,
   storage: Multer.memoryStorage()

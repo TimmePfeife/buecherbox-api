@@ -1,3 +1,4 @@
+const Config = require('../../config');
 const Fs = require('fs');
 const Path = require('path');
 const Pool = require('pg').Pool;
@@ -22,13 +23,7 @@ function readSql () {
   }
 }
 
-const _pool = new Pool({
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT
-});
+const _pool = new Pool(Config.db);
 
 readSql();
 

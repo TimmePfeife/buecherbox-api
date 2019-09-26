@@ -1,3 +1,4 @@
+const Config = require('../../config');
 const Path = require('path');
 const { createLogger, format, transports } = require('winston');
 require('winston-daily-rotate-file');
@@ -29,8 +30,8 @@ const consoleTransport = new transports.Console({
 });
 
 const fileTransport = new (transports.DailyRotateFile)({
-  filename: process.env.LOG_NAME,
-  dirname: process.env.LOG_DIR,
+  filename: Config.logs.name,
+  dirname: Config.logs.dir,
   datePattern: 'YYYY-MM-DD-HH',
   zippedArchive: true,
   maxSize: '20m',
@@ -45,7 +46,7 @@ const fileTransport = new (transports.DailyRotateFile)({
 });
 
 const Logger = createLogger({
-  level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
+  level: Config.environment === 'development' ? 'debug' : 'info',
   transports: [
     consoleTransport,
     fileTransport

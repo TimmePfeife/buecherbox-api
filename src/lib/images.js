@@ -1,3 +1,4 @@
+const Config = require('../../config');
 const Crypto = require('crypto');
 const Db = require('../lib/db');
 const FileType = require('file-type');
@@ -43,12 +44,12 @@ async function save (file) {
   const filename = generateFilename(file);
   file.filename = filename;
 
-  let path = process.env.UPLOAD_DIR;
+  let path = Config.upload.dir;
   if (!Fs.existsSync(path)) {
     Fs.mkdirSync(path, { recursive: true });
   }
 
-  path = Path.join(process.env.UPLOAD_DIR, filename);
+  path = Path.join(Config.upload.dir, filename);
   await Fs.writeFileSync(path, file.buffer);
   file.path = path;
 
@@ -63,12 +64,12 @@ async function save (file) {
  * @returns {Promise<void>}
  */
 async function saveThumbnail (file) {
-  let path = Path.join(process.env.UPLOAD_DIR, 'thumbnail');
+  let path = Path.join(Config.upload.dir, 'thumbnail');
   if (!Fs.existsSync(path)) {
     Fs.mkdirSync(path, { recursive: true });
   }
 
-  path = Path.join(process.env.UPLOAD_DIR, 'thumbnail', file.filename);
+  path = Path.join(Config.upload.dir, 'thumbnail', file.filename);
 
   const image = await Jimp.read(file.path);
 
@@ -95,7 +96,7 @@ async function createImage (file) {
   const binds = [
     file.filename,
     file.mimetype,
-    process.env.UPLOAD_DIR,
+    Config.upload.dir,
     file.path,
     file.size,
     file.thumbnail

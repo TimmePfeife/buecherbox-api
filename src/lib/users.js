@@ -1,4 +1,5 @@
 const Argon = require('argon2');
+const Config = require('../../config');
 const Crypto = require('crypto');
 const Db = require('./db');
 const Jwt = require('jsonwebtoken');
@@ -32,7 +33,7 @@ function authenticateJwt (jwt) {
   if (header[0].toLowerCase() !== 'bearer') return null;
 
   const token = header[1];
-  return Jwt.verify(token, process.env.JWT_SECRET);
+  return Jwt.verify(token, Config.token.secret);
 }
 
 /**
@@ -48,7 +49,7 @@ function createJwt (data) {
     ...data
   };
 
-  return Jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: 24 * 60 * 60});
+  return Jwt.sign(payload, Config.token.secret, { expiresIn: 24 * 60 * 60 });
 }
 
 /**

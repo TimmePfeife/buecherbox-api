@@ -1,13 +1,12 @@
-require('dotenv').config();
-
 const BodyParser = require('body-parser');
+const Config = require('config');
 const Cors = require('cors');
 const Express = require('express');
 const Helmet = require('helmet');
 const Logger = require('./src/lib/logger');
 const Routes = require('./src/routes');
 
-const port = process.env.PORT || 3000;
+const port = Config.server.port || 3000;
 
 const App = Express();
 
