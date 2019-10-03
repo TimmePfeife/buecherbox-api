@@ -25,5 +25,11 @@ module.exports = {
   upload: {
     dir: process.env.UPLOAD_DIR,
     size: process.env.UPLOAD_SIZE
+  },
+
+  limits: {
+    standard: 100,
+    critical: 5,
+    timeout: 1 * 60 * 1000 // 1 minute
   }
 };

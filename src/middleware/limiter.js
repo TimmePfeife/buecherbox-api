@@ -1,3 +1,4 @@
+const Config = require('../../config');
 const Limiter = require('express-rate-limit');
 const RedisLimiter = require('rate-limit-redis');
 
@@ -8,8 +9,8 @@ const RedisLimiter = require('rate-limit-redis');
 /**
  * Middleware to limit repeated requests to an endpoint.
  */
-module.exports = Limiter({
+module.exports = (max) => Limiter({
   store: new RedisLimiter({}),
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 5
+  windowMs: Config.limits.timeout,
+  max: max
 });

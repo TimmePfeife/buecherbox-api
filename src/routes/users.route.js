@@ -1,4 +1,5 @@
 const Auth = require('../middleware/auth');
+const Config = require('../../config');
 const BookBox = require('../lib/bookbox');
 const Express = require('express');
 const HttpStatus = require('http-status-codes');
@@ -9,7 +10,7 @@ const Validation = require('../middleware/validation');
 
 const Router = Express.Router();
 
-Router.post('/', Limiter, Validation('users'), async (req, res) => {
+Router.post('/', Limiter(Config.limits.critical), Validation('users'), async (req, res) => {
   try {
     const user = await Users.createUser(req.body.username, req.body.password);
     if (!user) {
@@ -27,6 +28,7 @@ Router.post('/', Limiter, Validation('users'), async (req, res) => {
       id: user.id,
       role: role.name
     });
+
     delete user.password;
 
     res.status(HttpStatus.CREATED).json(user);
@@ -46,7 +48,7 @@ Router.post('/', Limiter, Validation('users'), async (req, res) => {
   }
 });
 
-Router.post('/auth', Limiter, async (req, res) => {
+Router.post('/auth', Limiter(Config.limits.critical), async (req, res) => {
   try {
     const auth = req.get('authorization');
     if (!auth) {
@@ -59,7 +61,7 @@ Router.post('/auth', Limiter, async (req, res) => {
 
     const user = await Users.getUserByUsername(username);
     if (!user && user.deleted) {
-      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      res.sendStatus(HttpStatus.NOT_FOUND);
       return;
     }
 
@@ -79,6 +81,7 @@ Router.post('/auth', Limiter, async (req, res) => {
       id: user.id,
       role: role.name
     });
+
     const refreshToken = await Users.createRefreshToken(user.id, '1 day');
 
     await Users.setUserLastLogin(user.id);
@@ -96,7 +99,7 @@ Router.post('/auth', Limiter, async (req, res) => {
   }
 });
 
-Router.post('/:id/refresh', Limiter, async (req, res) => {
+Router.post('/:id/refresh', Limiter(Config.limits.critical), async (req, res) => {
   try {
     const auth = req.get('authorization');
     if (!auth) {
@@ -108,7 +111,7 @@ Router.post('/:id/refresh', Limiter, async (req, res) => {
     const userId = req.params.id;
 
     if (!await Users.checkRefreshToken(userId, refreshToken)) {
-      return res.sendStatus(HttpStatus.UNAUTHORIZED);
+      return res.sendStatus(HttpStatus.FORBIDDEN);
     }
 
     const user = await Users.getUserById(userId);
@@ -139,7 +142,7 @@ Router.post('/:id/refresh', Limiter, async (req, res) => {
 
 // ToDo Router.post('/revoke')
 
-Router.get('/:id', Auth, async (req, res) => {
+Router.get('/:id', Limiter(Config.limits.standard), Auth, async (req, res) => {
   try {
     const userId = req.params.id;
     const user = await Users.getUserById(userId);
@@ -163,7 +166,7 @@ Router.delete('/:id', Auth, async (req, res) => {
     const userId = parseInt(req.params.id);
 
     if (userId !== req.token.id) {
-      res.sendStatus(HttpStatus.UNAUTHORIZED);
+      res.sendStatus(HttpStatus.FORBIDDEN);
       return;
     }
 
