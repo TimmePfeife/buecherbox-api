@@ -99,7 +99,7 @@ Router.post('/auth', Limiter(Config.limits.critical), async (req, res) => {
   }
 });
 
-Router.post('/:id/refresh', Limiter(Config.limits.critical), async (req, res) => {
+Router.get('/:id/refresh', Limiter(Config.limits.critical), async (req, res) => {
   try {
     const auth = req.get('authorization');
     if (!auth) {
