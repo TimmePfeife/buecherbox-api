@@ -18,7 +18,9 @@ Chai.agent = Chai.request.agent(App);
 before(async () => {
   await Db.query(Db.sqlScripts['drop_tables.sql']);
 
+  await Db.query(Db.sqlScripts['create_roles.sql']);
   await Db.query(Db.sqlScripts['create_users.sql']);
+  await Db.query(Db.sqlScripts['create_tokens.sql']);
   await Db.query(Db.sqlScripts['create_images.sql']);
   await Db.query(Db.sqlScripts['create_bookboxes.sql']);
   await Db.query(Db.sqlScripts['create_favorites.sql']);

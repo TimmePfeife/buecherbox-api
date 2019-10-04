@@ -11,13 +11,14 @@ describe('lib/users', () => {
   it('createUser(user, credentials)', async () => {
     for (let i = 0; i < Data.entries; i++) {
       const user = Data.users[i];
+      const email = user.email;
       const username = user.username;
       const password = user.password;
 
       const noCredentials = await Users.createUser(username);
       expect(noCredentials).to.be.null;
 
-      const newUser = await Users.createUser(username, password);
+      const newUser = await Users.createUser(email, username, password);
       expect(newUser).to.be.an('object');
       expect(newUser.id).to.equal(user.id);
       expect(newUser.deleted).to.be.false;

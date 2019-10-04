@@ -24,6 +24,7 @@ function _initUsers () {
   for (let i = 0; i < entries; i++) {
     users.push({
       id: i + 1,
+      email: Faker.internet.email(),
       username: Faker.internet.userName().substring(0, 20),
       password: Faker.internet.password(),
       deleted: Faker.random.boolean(),
