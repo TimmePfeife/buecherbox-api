@@ -4,6 +4,11 @@
   "title": "Users",
   "type": "object",
   "properties": {
+    "email": {
+      "type": "string",
+      "description": "E-Mail",
+      "format": "email"
+    },
     "username": {
       "type": "string",
       "description": "Username"
@@ -13,5 +18,5 @@
       "description": "Password"
     }
   },
-  "required": [ "username", "password" ]
+  "required": [ "email", "username", "password" ]
 }

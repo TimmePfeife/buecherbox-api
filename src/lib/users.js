@@ -209,20 +209,22 @@ async function authenticateUserById (userId, password) {
 
 /**
  * Inserts a new user into the database and returns the result.
+ * @param {string} email
  * @param {string} username
  * @param {string} password
  * @returns {Promise<null>}
  */
-async function createUser (username, password) {
+async function createUser (email, username, password) {
   if (!username || !password) return null;
 
-  const sql = `INSERT INTO Users (username, password)
-               VALUES ($1, $2) RETURNING *`;
+  const sql = `INSERT INTO Users (email, username, password)
+               VALUES ($1, $2, $3) RETURNING *`;
 
   const hash = await hashPassword(password);
   if (!hash) return null;
 
   const binds = [
+    email,
     username,
     hash
   ];
@@ -259,6 +261,26 @@ async function getUserByUsername (username) {
   const sql = `SELECT *
                from Users
                where username = $1`;
+
+  const binds = [
+    username
+  ];
+
+  const result = await Db.query(sql, binds);
+
+  return result.rows.length ? result.rows[0] : null;
+}
+
+/**
+ * Selects an user by the username or email.
+ * @param {string} username
+ * @returns {Promise<null>}
+ */
+async function getUserByUsernameOrEmail(username) {
+  const sql = `SELECT *
+               from Users
+               where username = $1
+                  OR email = $1`;
 
   const binds = [
     username
@@ -467,6 +489,7 @@ module.exports = {
   getRoleById,
   getUserById,
   getUserByUsername,
+  getUserByUsernameOrEmail,
   setUserLastLogin,
   verifyPassword
 };

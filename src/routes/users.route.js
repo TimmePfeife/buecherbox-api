@@ -12,7 +12,7 @@ const Router = Express.Router();
 
 Router.post('/', Limiter(Config.limits.critical), Validation('users'), async (req, res) => {
   try {
-    const user = await Users.createUser(req.body.username, req.body.password);
+    const user = await Users.createUser(req.body.email, req.body.username, req.body.password);
     if (!user) {
       res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
       return;
@@ -59,8 +59,8 @@ Router.post('/auth', Limiter(Config.limits.critical), async (req, res) => {
     const username = credentials[0];
     const password = credentials[1];
 
-    const user = await Users.getUserByUsername(username);
-    if (!user && user.deleted) {
+    const user = await Users.getUserByUsernameOrEmail(username);
+    if (!user || user.deleted) {
       res.sendStatus(HttpStatus.NOT_FOUND);
       return;
     }
