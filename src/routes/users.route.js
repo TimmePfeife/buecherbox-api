@@ -24,6 +24,8 @@ Router.post('/', Limiter(Config.limits.critical), Validation('users'), async (re
       return;
     }
 
+    user.refreshToken = await Users.createRefreshToken(user.id, '1 day');
+
     user.token = Users.createJwt({
       id: user.id,
       role: role.name
@@ -40,10 +42,6 @@ Router.post('/', Limiter(Config.limits.critical), Validation('users'), async (re
       return;
     }
 
-    if (parseInt(e.code) === 23505) {
-      res.sendStatus(HttpStatus.CONFLICT);
-      return;
-    }
     res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
